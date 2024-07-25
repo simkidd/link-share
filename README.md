@@ -42,7 +42,7 @@ A full-stack link-sharing application built with Next.js, TypeScript, and Fireba
 
 3. **Set up environment variables:**
 
-    - Create a `.env.local` file in the root of your project with the following content:
+    - Create a `.env` file in the root of your project with the following content:
 
     ```env
     NEXT_PUBLIC_API_KEY=your-api-key
