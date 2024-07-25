@@ -40,39 +40,72 @@ A full-stack link-sharing application built with Next.js, TypeScript, and Fireba
     yarn
     ```
 
-3. **Set up Firebase:**
+3. **Set up environment variables:**
 
-    - Create a file named `firebaseConfig.ts` with your Firebase configuration:
+    - Create a `.env.local` file in the root of your project with the following content:
 
-    ```typescript
-    import { initializeApp } from 'firebase/app';
-    import { getFirestore } from 'firebase/firestore';
-    import { getAuth } from 'firebase/auth';
-
-    const firebaseConfig = {
-      apiKey: 'your-api-key',
-      authDomain: 'your-auth-domain',
-      projectId: 'your-project-id',
-      storageBucket: 'your-storage-bucket',
-      messagingSenderId: 'your-messaging-sender-id',
-      appId: 'your-app-id',
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const auth = getAuth(app);
-
-    export { db, auth };
+    ```env
+    NEXT_PUBLIC_API_KEY=your-api-key
+    NEXT_PUBLIC_AUTH_DOMAIN=your-auth-domain
+    NEXT_PUBLIC_PROJECT_ID=your-project-id
+    NEXT_PUBLIC_STORAGE_BUCKET=your-storage-bucket
+    NEXT_PUBLIC_MESSAGING_SENDER_ID=your-messaging-sender-id
+    NEXT_PUBLIC_APP_ID=your-app-id
+    NEXT_PUBLIC_MEASUREMENT_ID=your-measurement-id
     ```
 
-4. **Run the development server:**
+    Replace the placeholders (`your-api-key`, `your-auth-domain`, etc.) with the actual values from your Firebase project settings.
+
+4. **Set up Firebase configuration:**
+
+    - Create a file named `config.ts` with the following content:
+
+    ```typescript
+    export const config = {
+      apiKey: process.env.NEXT_PUBLIC_API_KEY,
+      authDomain: process.env.NEXT_PUBLIC_AUTH_DOMAIN,
+      projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
+      storageBucket: process.env.NEXT_PUBLIC_STORAGE_BUCKET,
+      messagingSenderId: process.env.NEXT_PUBLIC_MESSAGING_SENDER_ID,
+      appId: process.env.NEXT_PUBLIC_APP_ID,
+      measurementId: process.env.NEXT_PUBLIC_MEASUREMENT_ID,
+    };
+    ```
+
+    - Create a file named `firebaseConfig.ts` with the following content:
+
+    ```typescript
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "firebase/app";
+    import { getAuth } from "firebase/auth";
+    import { getFirestore } from "firebase/firestore";
+    import { config } from "./config";
+
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+      apiKey: config.apiKey,
+      authDomain: config.authDomain,
+      projectId: config.projectId,
+      storageBucket: config.storageBucket,
+      messagingSenderId: config.messagingSenderId,
+      appId: config.appId,
+      // measurementId: config.measurementId,
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    export { auth, db };
+    ```
+
+5. **Run the development server:**
 
     ```bash
     yarn dev
     ```
 
-5. Open your browser and go to [http://localhost:3000](http://localhost:3000).
+6. Open your browser and go to [http://localhost:3000](http://localhost:3000).
 
-## License
 
-This project is licensed under the MIT License.
