@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import "./globals.scss";
-import { Toaster } from "sonner";
+import "../globals.scss";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,8 +17,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Toaster position="top-right" richColors theme="system" />
-        <main>{children}</main>
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 py-12">
+          <img src="/logo.png" alt="devlinks" className="h-12 mx-auto mb-4" />
+
+          <div className="w-full max-w-md px-8 py-10 bg-white rounded-lg shadow-md">
+            {children}
+          </div>
+        </div>
       </body>
     </html>
   );
