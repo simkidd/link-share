@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable react/no-unescaped-entities */
 import {
   CreateLinkInput,
   Link,
@@ -6,6 +7,8 @@ import {
 } from "@/interfaces/link.interface";
 import { useLinkStore } from "@/stores/link.store";
 import React, { useState, useEffect } from "react";
+import Button from "./ui/Button";
+import Image from "next/image";
 
 const platforms = [
   "GitHub",
@@ -100,24 +103,40 @@ const LinkList = () => {
   };
 
   return (
-    <div className="flex flex-col items-center p-8 max-w-xl mx-auto">
-      <h1 className="text-2xl mb-2">Customize your links</h1>
-      <p className="text-lg mb-5">
-        Add/edit/remove links below and then share all your profiles with the
-        world!
-      </p>
-      <button
-        onClick={handleAddLinkForm}
-        className="bg-indigo-600 text-white py-2 px-4 rounded mb-5"
-      >
-        + Add new link
-      </button>
+    <div className="bg-white">
+      <div className="px-10 pt-10">
+        <h2 className="font-bold text-[32px] text-[#333333] mb-2">
+          Customize Your Links
+        </h2>
+        <p className="font-normal text-base text-[#737373] mb-10">
+          Add/edit/remove links below and then share all your profiles with the
+          world!
+        </p>
 
-      <>
+        <Button
+          variant="outline"
+          className="flex items-center gap-2 w-full justify-center mb-6"
+          onClick={handleAddLinkForm}
+        >
+          {/* <FaPlus /> */}
+          Add New Link
+        </Button>
+      </div>
+
+      <div className="px-10">
         {links.length === 0 && newLinks.length === 0 && (
-          <div className="text-center mb-5">
-            <h2 className="text-xl font-semibold">Let’s get you started</h2>
-            <p className="text-gray-700">
+          <div className="flex justify-center flex-col items-center bg-[#FAFAFA] py-16 lg:px-[100px] rounded-xl">
+            <Image
+              src="/images/Group 273.png"
+              alt="vector"
+              height={250}
+              width={250}
+              className="w-[249px]"
+            />
+            <h3 className="font-bold text-[32px] text-[#333333] pt-10 pb-6">
+              Let's Get you Started
+            </h3>
+            <p className="font-normal text-base text-[#737373] text-center">
               Use the “Add new link” button to get started. Once you have more
               than one link, you can reorder and edit them. We’re here to help
               you share your profiles with everyone!
@@ -261,7 +280,7 @@ const LinkList = () => {
             </li>
           ))}
         </ul>
-      </>
+      </div>
 
       {(newLinks.length > 0 || editingLinks.length > 0) && (
         <button

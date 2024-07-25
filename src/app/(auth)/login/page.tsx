@@ -1,21 +1,23 @@
+/* eslint-disable react/no-unescaped-entities */
 import React from "react";
 import LoginForm from "../components/LoginForm";
+import Link from "next/link";
 
 const LoginPage = () => {
   return (
     <div className="w-full">
-      <div className="mb-6">
-        <h1 className="text-2xl font-semibold">Login</h1>
-        <p className="text-gray-500">
+      <div className="mb-10">
+        <h1 className="text-3xl font-semibold mb-2">Login</h1>
+        <p className="text-gray-500 text-base">
           App your details below to get back into the app
         </p>
       </div>
       <LoginForm />
-      <p className="mt-4 text-center text-gray-500">
+      <p className="mt-6 text-center text-gray-500">
         Don't have an account?{" "}
-        <a href="/sign-up" className="text-indigo-600 hover:underline">
+        <Link href="/sign-up" className="text-primary hover:underline">
           Create account
-        </a>
+        </Link>
       </p>
     </div>
   );

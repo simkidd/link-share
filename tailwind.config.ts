@@ -8,7 +8,16 @@ const config: Config = {
   ],
   theme: {
     extend: {
-      
+      fontFamily: {
+        instrument: ['"Instrument Sans", sans-serif'],
+      },
+      colors: {
+        primary: {
+          DEFAULT: "#633CFF",
+          100: "#EFEBFF",
+          200: "#BEADFF",
+        },
+      },
     },
   },
   plugins: [],

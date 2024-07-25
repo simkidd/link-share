@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "../globals.scss";
 import { Toaster } from "sonner";
+import Link from "next/link";
+import Logo from "@/components/Logo";
+import NextTopLoader from "nextjs-toploader";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,13 +21,26 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-      <Toaster position="top-right" richColors theme="system" />
+        <NextTopLoader
+          color="#633CFF"
+          initialPosition={0.08}
+          crawlSpeed={200}
+          height={3}
+          crawl={true}
+          showSpinner={false}
+          easing="ease"
+          speed={200}
+        />
+        <Toaster position="top-right" richColors theme="system" />
 
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 py-12">
-          <img src="/logo.png" alt="devlinks" className="h-12 mx-auto mb-4" />
-
-          <div className="w-full max-w-md px-8 py-10 bg-white rounded-lg shadow-md">
-            {children}
+        <div className="md:bg-gray-50 bg-white">
+          <div className="flex flex-col items-center md:justify-center min-h-screen md:py-12 py-8 container mx-auto px-2">
+            <Link href="/">
+              <Logo />
+            </Link>
+            <div className="bg-white rounded-xl md:shadow-sm md:w-[500px] md:px-10 px-5 md:py-10 py-3 mt-[50px]">
+              {children}
+            </div>
           </div>
         </div>
       </body>
