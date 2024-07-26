@@ -4,3 +4,9 @@
 @tailwind components;
 @tailwind utilities;
 
+
+.scrollbar-phone {
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}

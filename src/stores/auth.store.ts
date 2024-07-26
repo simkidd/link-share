@@ -5,11 +5,14 @@ import {
   createUserWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
+  UserCredential,
 } from "firebase/auth";
 import { CreateUserInput, LoginUserInput } from "@/interfaces/auth.interface";
 import { User } from "@/interfaces/user.interface";
 import { toast } from "sonner";
 import { FirebaseError } from "firebase/app";
+import Cookies from "js-cookie";
+import { TOKEN_NAME, USER_DETAILS } from "@/utils/constants";
 
 interface IAuthStore {
   loading: boolean;
@@ -18,6 +21,7 @@ interface IAuthStore {
   createUser: (input: CreateUserInput) => Promise<void>;
   login: (input: LoginUserInput) => Promise<void>;
   logout: () => void;
+  initializeAuth: () => void;
 }
 
 const getFirebaseErrorMessage = (error: FirebaseError) => {
@@ -52,8 +56,15 @@ export const useAuthStore = create<IAuthStore>((set) => ({
   createUser: async (input) => {
     try {
       set({ loading: true });
-      await createUserWithEmailAndPassword(auth, input.email, input.password);
-      toast.success("Account Created Successfully");
+      await createUserWithEmailAndPassword(auth, input.email, input.password)
+        .then((res) => {
+          if (res.user) {
+            toast.success("Account Created Successfully");
+          }
+        })
+        .finally(() => {
+          window.location.href = "/login";
+        });
     } catch (error) {
       console.log(error);
       const errorMsg = getFirebaseErrorMessage(error as FirebaseError);
@@ -65,8 +76,15 @@ export const useAuthStore = create<IAuthStore>((set) => ({
   login: async (input) => {
     try {
       set({ loading: true });
-      await signInWithEmailAndPassword(auth, input.email, input.password);
-      toast.success("Login Successful");
+      await signInWithEmailAndPassword(auth, input.email, input.password)
+        .then((res) => {
+          if (res.user) {
+            toast.success("Login Successful");
+          }
+        })
+        .finally(() => {
+          window.location.href = "/";
+        });
     } catch (error) {
       console.log(error);
       const errorMsg = getFirebaseErrorMessage(error as FirebaseError);
@@ -77,6 +95,29 @@ export const useAuthStore = create<IAuthStore>((set) => ({
   },
   logout: async () => {
     await signOut(auth);
+    Cookies.remove(TOKEN_NAME);
     set({ user: null });
+    window.location.href = "/login";
+  },
+  initializeAuth: () => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const token = await user.getIdToken();
+        Cookies.set(TOKEN_NAME, token);
+        set({
+          user: {
+            uid: user.uid,
+            email: user.email || "",
+            displayName: user.displayName || "",
+            photoUrl: user.photoURL || "",
+          },
+        });
+      } else {
+        Cookies.remove(TOKEN_NAME);
+        set({ user: null });
+      }
+    });
+
+    return () => unsubscribe();
   },
 }));
