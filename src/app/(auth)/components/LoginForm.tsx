@@ -82,14 +82,14 @@ const LoginForm = () => {
             onBlur={formik.handleBlur}
             value={formik.values.password}
             placeholder="Enter your password"
-            className={`w-full pl-10 pr-10 py-2 border rounded-lg focus:outline-none focus:border-indigo-500 ${
+            className={`w-full pl-10 pr-12 py-2 border rounded-lg focus:outline-none focus:border-indigo-500 ${
               formik.touched.password &&
               formik.errors.password &&
               "border-red-500"
             }`}
           />
           <span
-            className="absolute right-3 top-1/2 -translate-y-1/2  text-gray-400 cursor-pointer"
+            className="absolute right-3 top-1/2 -translate-y-1/2  text-gray-400 cursor-pointer size-8 flex items-center justify-center"
             onClick={togglePasswordVisibility}
           >
             {showPassword ? <FaEyeSlash /> : <FaEye />}
