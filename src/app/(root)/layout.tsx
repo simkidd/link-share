@@ -3,6 +3,10 @@ import { Inter } from "next/font/google";
 import "../globals.scss";
 import { Toaster } from "sonner";
 import NextTopLoader from "nextjs-toploader";
+import { Suspense } from "react";
+import { Providers } from "../providers";
+import PhoneMockup from "@/components/PhoneMockup";
+import Header from "@/components/Header";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -30,7 +34,25 @@ export default function RootLayout({
           speed={200}
         />
         <Toaster position="top-right" richColors theme="system" />
-        <main>{children}</main>
+        <Providers>
+          <Suspense fallback={<div>Loading...</div>}>
+            <Header />
+            <div className="md:bg-gray-50 bg-white min-h-dvh">
+              <div className="container mx-auto px-2 md:px-0 grid lg:grid-cols-5 grid-cols-1 gap-6 pb-6">
+                <div className="col-span-2 hidden lg:flex">
+                  <div className="bg-white shadow-sm rounded-xl w-full">
+                    <PhoneMockup />
+                  </div>
+                </div>
+                <div className="lg:col-span-3 col-span-1">
+                  <div className="bg-white shadow-sm rounded-xl w-full h-full">
+                    {children}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Suspense>
+        </Providers>
       </body>
     </html>
   );

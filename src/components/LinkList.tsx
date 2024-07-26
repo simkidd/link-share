@@ -8,14 +8,26 @@ import {
 import { useLinkStore } from "@/stores/link.store";
 import React, { useState, useEffect } from "react";
 import Button from "./ui/Button";
+import Select from "./ui/Select";
 import Image from "next/image";
+import {
+  FaGithub,
+  FaPlus,
+  FaYoutube,
+  FaLinkedin,
+  FaFacebook,
+  FaCodepen,
+  FaLink,
+  FaPenToSquare,
+} from "react-icons/fa6";
+import { FaPenSquare, FaTimesCircle } from "react-icons/fa";
 
 const platforms = [
-  "GitHub",
-  "YouTube",
-  "LinkedIn",
-  "Facebook",
-  "Frontend Mentor",
+  { value: "GitHub", label: "GitHub", icon: <FaGithub /> },
+  { value: "YouTube", label: "YouTube", icon: <FaYoutube /> },
+  { value: "LinkedIn", label: "LinkedIn", icon: <FaLinkedin /> },
+  { value: "Facebook", label: "Facebook", icon: <FaFacebook /> },
+  { value: "Frontend Mentor", label: "Frontend Mentor", icon: <FaCodepen /> },
 ];
 
 const LinkList = () => {
@@ -103,8 +115,8 @@ const LinkList = () => {
   };
 
   return (
-    <div className="bg-white">
-      <div className="px-10 pt-10">
+    <div className="w-full py-10">
+      <div className="w-full lg:px-10 px-2">
         <h2 className="font-bold text-[32px] text-[#333333] mb-2">
           Customize Your Links
         </h2>
@@ -115,15 +127,15 @@ const LinkList = () => {
 
         <Button
           variant="outline"
-          className="flex items-center gap-2 w-full justify-center mb-6"
+          className="flex items-center gap-2 w-full justify-center mb-6 font-medium"
           onClick={handleAddLinkForm}
         >
-          {/* <FaPlus /> */}
+          <FaPlus />
           Add New Link
         </Button>
       </div>
 
-      <div className="px-10">
+      <div className="my-6 lg:px-10 px-2">
         {links.length === 0 && newLinks.length === 0 && (
           <div className="flex justify-center flex-col items-center bg-[#FAFAFA] py-16 lg:px-[100px] rounded-xl">
             <Image
@@ -143,55 +155,50 @@ const LinkList = () => {
             </p>
           </div>
         )}
-        <ul className="w-full">
+        <ul className="w-full space-y-6">
           {links.map((link, index) => (
             <li
               key={link.id}
-              className="flex flex-col mb-4 p-4 border border-gray-300 rounded"
+              className="p-5 bg-[#fafafa] border-gray-100 border rounded-xl"
             >
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-lg">Link #{index + 1}</span>
-                <div className="flex">
+              <div className="flex justify-between items-center mb-3">
+                <span className="text-base font-bold">Link #{index + 1}</span>
+                <div className="flex items-center gap-2">
                   <button
                     onClick={() => handleEditLink(link)}
-                    className="text-indigo-600 mr-2"
+                    className="text-primary flex items-center gap-1 text-base"
                   >
+                    <FaPenToSquare />
                     Edit
                   </button>
                   <button
                     onClick={() => handleDeleteLink(link.id)}
-                    className="text-red-500"
+                    className="text-red-500 flex items-center gap-1 text-base"
                   >
+                    <FaTimesCircle />
                     Remove
                   </button>
                 </div>
               </div>
               {editingLinks.find((editLink) => editLink.id === link.id) ? (
                 <>
-                  <label className="flex flex-col mb-2">
-                    Platform
-                    <select
+                  <label className="flex flex-col text-[12px]">Platform</label>
+                  <div className="mb-3">
+                    <Select
+                      options={platforms}
                       value={
                         editingLinks.find((editLink) => editLink.id === link.id)
                           ?.platform || ""
                       }
-                      onChange={(e) =>
-                        handleChangeEditing(link.id, "platform", e.target.value)
+                      onChange={(value) =>
+                        handleChangeEditing(link.id, "platform", value)
                       }
-                      className="p-2 mt-1 border border-gray-300 rounded"
-                    >
-                      <option value="" disabled>
-                        Select platform
-                      </option>
-                      {platforms.map((platform) => (
-                        <option key={platform} value={platform}>
-                          {platform}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                  <label className="flex flex-col">
-                    Link
+                    />
+                  </div>
+
+                  <label className="flex flex-col text-[12px]">Link</label>
+                  <div className="relative mt-1">
+                    <FaLink className="absolute left-4 top-1/2 transform -translate-y-1/2" />
                     <input
                       type="text"
                       value={
@@ -201,100 +208,124 @@ const LinkList = () => {
                       onChange={(e) =>
                         handleChangeEditing(link.id, "url", e.target.value)
                       }
-                      placeholder="e.g. https://www.example.com"
-                      className="p-2 mt-1 border border-gray-300 rounded"
+                      placeholder="https://www.example.com"
+                      className="p-2 pl-10 border border-gray-300 rounded-lg w-full"
                     />
-                  </label>
+                  </div>
                 </>
               ) : (
                 <>
-                  <label className="flex flex-col mb-2">
-                    Platform
+                  <label className="flex flex-col text-[12px]">Platform</label>
+                  <div className="relative mb-3 mt-1">
+                    {renderIconByPlatform(link.platform)}
                     <input
                       type="text"
                       value={link.platform}
-                      className="p-2 mt-1 border border-gray-300 rounded"
+                      className="p-2 pl-10 border border-gray-300 rounded-lg w-full focus:outline-none text-gray-500"
                       readOnly
                     />
-                  </label>
-                  <label className="flex flex-col">
-                    Link
+                  </div>
+
+                  <label className="flex flex-col text-[12px]">Link</label>
+                  <div className="relative mt-1">
+                    <FaLink className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500" />
                     <input
                       type="text"
                       value={link.url}
-                      className="p-2 mt-1 border border-gray-300 rounded"
+                      className="p-2 pl-10 border border-gray-300 rounded-lg w-full focus:outline-none text-gray-500"
                       readOnly
                     />
-                  </label>
+                  </div>
                 </>
               )}
             </li>
           ))}
+          {/* adding new link */}
           {newLinks.map((link, index) => (
             <li
               key={index}
-              className="flex flex-col mb-4 p-4 border border-gray-300 rounded"
+              className="flex flex-col mb-4 p-4 border bg-[#fafafa] border-gray-100 rounded-xl"
             >
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-lg">
+              <div className="flex justify-between items-center mb-3">
+                <span className="text-base font-bold">
                   Link #{links.length + index + 1}
                 </span>
                 <button
                   onClick={() => handleRemoveNewLink(index)}
-                  className="text-red-500"
+                  className="text-red-500 flex items-center gap-1 text-base"
                 >
+                  <FaTimesCircle />
                   Remove
                 </button>
               </div>
-              <label className="flex flex-col mb-2">
-                Platform
-                <select
+              <label className="flex flex-col text-[12px]">Platform</label>
+              <div className="mb-3">
+                <Select
+                  options={platforms}
                   value={link.platform}
-                  onChange={(e) =>
-                    handleChangeNew(index, "platform", e.target.value)
-                  }
-                  className="p-2 mt-1 border border-gray-300 rounded"
-                >
-                  <option value="" disabled>
-                    Select platform
-                  </option>
-                  {platforms.map((platform) => (
-                    <option key={platform} value={platform}>
-                      {platform}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="flex flex-col">
-                Link
+                  onChange={(e) => handleChangeNew(index, "platform", e)}
+                />
+              </div>
+              <label className="flex flex-col text-[12px]">Link</label>
+              <div className="relative mt-1">
+                <FaLink className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-700" />
                 <input
                   type="text"
                   value={link.url}
                   onChange={(e) =>
                     handleChangeNew(index, "url", e.target.value)
                   }
-                  placeholder="e.g. https://www.example.com"
-                  className="p-2 mt-1 border border-gray-300 rounded"
+                  placeholder="https://www.example.com"
+                  className="p-2 pl-10 border border-gray-300 rounded-lg w-full"
                 />
-              </label>
+              </div>
             </li>
           ))}
         </ul>
       </div>
 
-      {(newLinks.length > 0 || editingLinks.length > 0) && (
-        <button
-          onClick={handleSaveLinks}
-          className={`bg-indigo-600 text-white py-2 px-4 rounded mt-5 ${
-            isSaveDisabled() ? "opacity-50 cursor-not-allowed" : ""
-          }`}
-          disabled={isSaveDisabled()}
-        >
-          {loadingSave ? "Saving..." : "Save"}
-        </button>
-      )}
+      <div className="w-full lg:px-10 px-2 border-t py-6 flex justify-end">
+        {(newLinks.length > 0 || editingLinks.length > 0) && (
+          <Button
+            variant="solid"
+            onClick={handleSaveLinks}
+            disabled={isSaveDisabled()}
+          >
+            {loadingSave ? "Saving..." : "Save"}
+          </Button>
+        )}
+      </div>
     </div>
   );
 };
 
 export default LinkList;
+
+const renderIconByPlatform = (platform: string) => {
+  switch (platform) {
+    case "GitHub":
+      return (
+        <FaGithub className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500" />
+      );
+    case "YouTube":
+      return (
+        <FaYoutube className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500" />
+      );
+    case "LinkedIn":
+      return (
+        <FaLinkedin className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500" />
+      );
+    case "Facebook":
+      return (
+        <FaFacebook className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500" />
+      );
+    case "Frontend Mentor":
+      return (
+        <FaCodepen className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500" />
+      );
+    default:
+      return (
+        <FaLink className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500" />
+      );
+  }
+};
