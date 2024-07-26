@@ -7,8 +7,8 @@ import {
 } from "@/interfaces/link.interface";
 import { useLinkStore } from "@/stores/link.store";
 import React, { useState, useEffect } from "react";
-import Button from "./ui/Button";
-import Select from "./ui/Select";
+import Button from "../../../components/ui/Button";
+import Select from "../../../components/ui/Select";
 import Image from "next/image";
 import {
   FaGithub,
@@ -116,8 +116,8 @@ const LinkList = () => {
 
   return (
     <div className="w-full py-10">
-      <div className="w-full lg:px-10 px-2">
-        <h2 className="font-bold text-[32px] text-[#333333] mb-2">
+      <div className="w-full lg:px-10 md:px-6 px-4">
+        <h2 className="font-bold md:text-[32px] text-2xl text-[#333333] mb-2">
           Customize Your Links
         </h2>
         <p className="font-normal text-base text-[#737373] mb-10">
@@ -135,17 +135,17 @@ const LinkList = () => {
         </Button>
       </div>
 
-      <div className="my-6 lg:px-10 px-2">
+      <div className="my-6 lg:px-10 md:px-6 px-4">
         {links.length === 0 && newLinks.length === 0 && (
-          <div className="flex justify-center flex-col items-center bg-[#FAFAFA] py-16 lg:px-[100px] rounded-xl">
+          <div className="flex justify-center flex-col items-center bg-[#FAFAFA] py-16 lg:px-[100px] md:px-12 px-8 rounded-xl">
             <Image
               src="/images/Group 273.png"
               alt="vector"
               height={250}
               width={250}
-              className="w-[249px]"
+              className="md:w-[249px] w-[130px]"
             />
-            <h3 className="font-bold text-[32px] text-[#333333] pt-10 pb-6">
+            <h3 className="font-bold md:text-[32px] text-2xl text-[#333333] pt-10 pb-6">
               Let's Get you Started
             </h3>
             <p className="font-normal text-base text-[#737373] text-center">
@@ -284,12 +284,13 @@ const LinkList = () => {
         </ul>
       </div>
 
-      <div className="w-full lg:px-10 px-2 border-t py-6 flex justify-end">
+      <div className="w-full lg:px-10 md:px-6 px-4 border-t py-6 flex justify-end">
         {(newLinks.length > 0 || editingLinks.length > 0) && (
           <Button
             variant="solid"
             onClick={handleSaveLinks}
             disabled={isSaveDisabled()}
+            className="w-full md:w-fit"
           >
             {loadingSave ? "Saving..." : "Save"}
           </Button>

@@ -69,7 +69,7 @@ const Select: React.FC<SelectProps> = ({
         )}
       </button>
       {isOpen && (
-        <ul className="absolute mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg z-10">
+        <ul className="absolute mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg z-10 overflow-hidden">
           {options.map((option) => (
             <li
               key={option.value}

@@ -5,8 +5,8 @@ import { Toaster } from "sonner";
 import NextTopLoader from "nextjs-toploader";
 import { Suspense } from "react";
 import { Providers } from "../providers";
-import PhoneMockup from "@/components/PhoneMockup";
 import Header from "@/components/Header";
+import PhoneMockup from "./components/PhoneMockup";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -37,15 +37,15 @@ export default function RootLayout({
         <Providers>
           <Suspense fallback={<div>Loading...</div>}>
             <Header />
-            <div className="md:bg-gray-50 bg-white min-h-dvh">
-              <div className="container mx-auto px-2 md:px-0 grid lg:grid-cols-5 grid-cols-1 gap-6 pb-6">
+            <div className="bg-gray-50 min-h-dvh">
+              <div className="container mx-auto px-2 md:px-0 grid lg:grid-cols-5 grid-cols-1 gap-6 py-6 md:pt-0">
                 <div className="col-span-2 hidden lg:flex">
                   <div className="bg-white shadow-sm rounded-xl w-full">
                     <PhoneMockup />
                   </div>
                 </div>
                 <div className="lg:col-span-3 col-span-1">
-                  <div className="bg-white shadow-sm rounded-xl w-full h-full">
+                  <div className="bg-white md:shadow-sm rounded-xl w-full h-full">
                     {children}
                   </div>
                 </div>

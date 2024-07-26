@@ -94,10 +94,10 @@ export const useAuthStore = create<IAuthStore>((set) => ({
     }
   },
   logout: async () => {
-    await signOut(auth);
-    Cookies.remove(TOKEN_NAME);
-    set({ user: null });
     window.location.href = "/login";
+    Cookies.remove(TOKEN_NAME);
+    await signOut(auth);
+    set({ user: null });
   },
   initializeAuth: () => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {

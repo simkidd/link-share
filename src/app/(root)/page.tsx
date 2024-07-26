@@ -1,7 +1,4 @@
-import Header from "@/components/Header";
-import LinkList from "@/components/LinkList";
-import PhoneMockup from "@/components/PhoneMockup";
-import React from "react";
+import LinkList from "./components/LinkList";
 
 const Home = () => {
   return (

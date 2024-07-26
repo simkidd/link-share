@@ -10,9 +10,11 @@ const Logo = () => {
         loading="lazy"
         width={40}
         height={40}
-        className="object-cover "
+        className="object-contain"
       />
-      <p className="font-bold text-[28px]">devlinks</p>
+      <p className="font-bold md:text-[28px] text-[24px] hidden md:block">
+        devlinks
+      </p>
     </div>
   );
 };
