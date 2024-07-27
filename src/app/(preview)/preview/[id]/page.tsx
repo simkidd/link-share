@@ -1,7 +1,7 @@
 import React from "react";
-import PreviewComp from "./components/PreviewComp";
 import Link from "next/link";
 import Button from "@/components/ui/Button";
+import PreviewComp from "../components/PreviewComp";
 
 const PreviewPage = () => {
   return (
