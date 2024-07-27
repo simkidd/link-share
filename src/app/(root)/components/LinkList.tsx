@@ -115,16 +115,8 @@ const LinkList = () => {
   };
 
   return (
-    <div className="w-full py-10">
+    <div className="w-full">
       <div className="w-full lg:px-10 md:px-6 px-4">
-        <h2 className="font-bold md:text-[32px] text-2xl text-[#333333] mb-2">
-          Customize Your Links
-        </h2>
-        <p className="font-normal text-base text-[#737373] mb-10">
-          Add/edit/remove links below and then share all your profiles with the
-          world!
-        </p>
-
         <Button
           variant="outline"
           className="flex items-center gap-2 w-full justify-center mb-6 font-medium"

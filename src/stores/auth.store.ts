@@ -1,18 +1,19 @@
-import { create } from "zustand";
-import { auth } from "@/utils/firebaseConfig";
-import {
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged,
-  UserCredential,
-} from "firebase/auth";
 import { CreateUserInput, LoginUserInput } from "@/interfaces/auth.interface";
 import { User } from "@/interfaces/user.interface";
-import { toast } from "sonner";
+import { TOKEN_NAME } from "@/utils/constants";
+import { auth } from "@/utils/firebaseConfig";
+import { generateDisplayName } from "@/utils/helpers";
 import { FirebaseError } from "firebase/app";
+import {
+  createUserWithEmailAndPassword,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signOut,
+  updateProfile
+} from "firebase/auth";
 import Cookies from "js-cookie";
-import { TOKEN_NAME, USER_DETAILS } from "@/utils/constants";
+import { toast } from "sonner";
+import { create } from "zustand";
 
 interface IAuthStore {
   loading: boolean;
@@ -22,6 +23,7 @@ interface IAuthStore {
   login: (input: LoginUserInput) => Promise<void>;
   logout: () => void;
   initializeAuth: () => void;
+  updateUserProfile: (profile: Partial<User>) => Promise<void>;
 }
 
 const getFirebaseErrorMessage = (error: FirebaseError) => {
@@ -57,8 +59,10 @@ export const useAuthStore = create<IAuthStore>((set) => ({
     try {
       set({ loading: true });
       await createUserWithEmailAndPassword(auth, input.email, input.password)
-        .then((res) => {
+        .then(async (res) => {
           if (res.user) {
+            const displayName = generateDisplayName(input.email);
+            await updateProfile(res.user, { displayName });
             toast.success("Account Created Successfully");
           }
         })
@@ -76,15 +80,14 @@ export const useAuthStore = create<IAuthStore>((set) => ({
   login: async (input) => {
     try {
       set({ loading: true });
-      await signInWithEmailAndPassword(auth, input.email, input.password)
-        .then((res) => {
+      await signInWithEmailAndPassword(auth, input.email, input.password).then(
+        (res) => {
           if (res.user) {
             toast.success("Login Successful");
+            window.location.href = "/";
           }
-        })
-        .finally(() => {
-          window.location.href = "/";
-        });
+        }
+      );
     } catch (error) {
       console.log(error);
       const errorMsg = getFirebaseErrorMessage(error as FirebaseError);
@@ -119,5 +122,29 @@ export const useAuthStore = create<IAuthStore>((set) => ({
     });
 
     return () => unsubscribe();
+  },
+  updateUserProfile: async (profile) => {
+    try {
+      set({ loading: true });
+      if (auth.currentUser) {
+        await updateProfile(auth.currentUser, profile);
+        toast.success("Profile updated successfully");
+
+        set((state) => ({
+          user: {
+            ...state.user,
+            ...profile,
+          } as User,
+        }));
+      } else {
+        toast.error("No user is currently signed in");
+      }
+    } catch (error) {
+      console.log(error);
+      const errorMsg = getFirebaseErrorMessage(error as FirebaseError);
+      toast.error(errorMsg);
+    } finally {
+      set({ loading: false });
+    }
   },
 }));
