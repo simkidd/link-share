@@ -2,16 +2,15 @@
 import React from "react";
 import LoginForm from "../components/LoginForm";
 import Link from "next/link";
+import PageHeader from "@/components/PageHeader";
 
 const LoginPage = () => {
   return (
     <div className="w-full">
-      <div className="mb-10">
-        <h1 className="text-3xl font-semibold mb-2">Login</h1>
-        <p className="text-gray-500 text-base">
-          App your details below to get back into the app
-        </p>
-      </div>
+      <PageHeader
+        title="Login"
+        desc="App your details below to get back into the app"
+      />
       <LoginForm />
       <p className="mt-6 text-center text-gray-500">
         Don't have an account?{" "}
