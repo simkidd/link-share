@@ -4,7 +4,7 @@ import {
   UpdateLinkInput,
 } from "@/interfaces/link.interface";
 import { create } from "zustand";
-import { db } from "@/utils/firebaseConfig";
+import { db, auth } from "@/utils/firebaseConfig";
 import {
   collection,
   addDoc,
@@ -34,15 +34,25 @@ export const useLinkStore = create<ILinkStore>((set) => ({
   addLink: async (input) => {
     try {
       set({ loadingSave: true });
+      const user = auth.currentUser;
+
+      if (!user) {
+        toast.error("User is not authenticated");
+        return;
+      }
+
       const { platform, url } = input;
-      const newLink = { platform, url };
-      const docRef = await addDoc(collection(db, "links"), newLink);
+      const newLink = { platform, url, author: user.uid };
+      const userLinksRef = collection(db, "users", user.uid, "links");
+      const docRef = await addDoc(userLinksRef, newLink);
+
       set((state) => ({
         links: [...state.links, { id: docRef.id, ...newLink }],
       }));
       toast.success("Link added");
     } catch (error) {
       console.log(error);
+      toast.error("Failed to add link");
     } finally {
       set({ loadingSave: false });
     }
@@ -50,10 +60,18 @@ export const useLinkStore = create<ILinkStore>((set) => ({
   updateLink: async (input) => {
     try {
       set({ loadingSave: true });
-      const linkDoc = doc(db, "links", input.id);
+      const user = auth.currentUser;
+
+      if (!user) {
+        toast.error("User is not authenticated");
+        return;
+      }
+
+      const linkDoc = doc(db, "users", user.uid, "links", input.id);
       const { platform, url } = input;
       const updatedLink = { platform, url };
       await updateDoc(linkDoc, updatedLink);
+
       set((state) => ({
         links: state.links.map((link) =>
           link.id === input.id ? { ...link, ...updatedLink } : link
@@ -62,6 +80,7 @@ export const useLinkStore = create<ILinkStore>((set) => ({
       toast.success("Link updated");
     } catch (error) {
       console.log(error);
+      toast.error("Failed to update link");
     } finally {
       set({ loadingSave: false });
     }
@@ -69,14 +88,23 @@ export const useLinkStore = create<ILinkStore>((set) => ({
   deleteLink: async (id) => {
     try {
       set({ loading: true });
-      const linkDoc = doc(db, "links", id);
+      const user = auth.currentUser;
+
+      if (!user) {
+        toast.error("User is not authenticated");
+        return;
+      }
+
+      const linkDoc = doc(db, "users", user.uid, "links", id);
       await deleteDoc(linkDoc);
+
       set((state) => ({
         links: state.links.filter((link) => link.id !== id),
       }));
       toast.success("Link removed");
     } catch (error) {
       console.log(error);
+      toast.error("Failed to remove link");
     } finally {
       set({ loading: false });
     }
@@ -84,7 +112,15 @@ export const useLinkStore = create<ILinkStore>((set) => ({
   fetchLinks: async () => {
     try {
       set({ loading: true });
-      const snapshot = await getDocs(collection(db, "links"));
+      const user = auth.currentUser;
+
+      if (!user) {
+        toast.error("User is not authenticated");
+        return;
+      }
+
+      const userLinksRef = collection(db, "users", user.uid, "links");
+      const snapshot = await getDocs(userLinksRef);
       const links = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
