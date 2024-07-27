@@ -2,6 +2,7 @@ export interface Link {
   id: string;
   platform: string;
   url: string;
+  author: string;
 }
 
 export interface CreateLinkInput {
