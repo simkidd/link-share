@@ -5,6 +5,7 @@ import { Toaster } from "sonner";
 import NextTopLoader from "nextjs-toploader";
 import { Suspense } from "react";
 import { Providers } from "../providers";
+import Loader from "@/components/Loader";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -31,9 +32,9 @@ export default function PreviewLayout({
           easing="ease"
           speed={200}
         />
-        <Toaster position="top-right" richColors theme="system" />
+        <Toaster position="top-right" richColors theme="system" closeButton />
         <Providers>
-          <Suspense fallback={<div>Loading...</div>}>
+          <Suspense fallback={<Loader />}>
             <div>{children}</div>
           </Suspense>
         </Providers>

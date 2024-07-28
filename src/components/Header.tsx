@@ -28,9 +28,9 @@ const Header = () => {
         </Link>
         <div className="flex gap-4 items-center">
           <Link
-            href="/"
+            href="/editor"
             className={`flex gap-2 items-center md:px-[27px] p-[11px] rounded-lg text-[#737373] hover:text-primary transition-colors duration-300 ease-in-out ${
-              isActive("/") ? "bg-primary-100 text-primary" : ""
+              isActive("/editor") ? "bg-primary-100 text-primary" : ""
             } `}
           >
             <FaLink size={18} />
@@ -55,7 +55,7 @@ const Header = () => {
           </div>
         )}
         <div>
-          <Link href="/preview">
+          <Link href={`/preview/${user?.uid}`}>
             <Button
               variant="outline"
               className="flex gap-2 items-center px-[11px] md:px-[27px]"

@@ -1,19 +1,50 @@
-import React from "react";
-import Link from "next/link";
-import Button from "@/components/ui/Button";
+import { Link } from "@/interfaces/link.interface";
+import { User } from "@/interfaces/user.interface";
+import { fetchUserData, fetchUserLinks } from "@/lib/data";
+import { Metadata } from "next";
+import { notFound } from "next/navigation";
 import PreviewComp from "../components/PreviewComp";
+import PreviewHeader from "../components/PreviewHeader";
 
-const PreviewPage = () => {
+interface IPreview {
+  params: { id: string };
+}
+
+// export const generateMetadata = async ({
+//   params,
+// }: IPreview): Promise<Metadata> => {
+//   console.log("preview page>>>", params.id)
+//   const uid = params.id;
+//   // const user = await fetchUserData(uid);
+
+//   return {
+//     title: user?.name,
+//     // description: user?.description,
+//     alternates: {
+//       canonical: `/user/${user?.uid}`,
+//     },
+//     openGraph: {
+//       title: user?.name,
+//       // description: user?.description,
+//       // images: [user?.images[0].url || ""],
+//     },
+//   };
+// };
+
+const PreviewPage = async ({ params }: IPreview) => {
+  const user = (await fetchUserData(params.id)) as User as any;
+  const links = (await fetchUserLinks(params.id)) as Link[];
+
+  // if (!user) {
+  //   notFound();
+  // }
+
   return (
     <div className="w-full">
-      <div className="flex gap-4 items-center justify-between container mx-auto px-2 py-4">
-        <Link href="/">
-          <Button variant="outline">Back to Editor</Button>
-        </Link>
-        <Button>Share Link</Button>
-      </div>
-      <div className="py-[60px]">
-        <PreviewComp />
+      <PreviewHeader />
+
+      <div className="py-[60px] container mx-auto px-2">
+        <PreviewComp user={user} links={links} />
       </div>
     </div>
   );

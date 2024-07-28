@@ -1,15 +1,20 @@
 "use client";
+import Loader from "@/components/Loader";
 import { useAuthStore } from "@/stores/auth.store";
 import React, { useEffect } from "react";
 
 const AuthGuard = ({ children }: { children: React.ReactNode }) => {
-  const { initializeAuth } = useAuthStore();
+  const { loadingUser, initializeAuth, user } = useAuthStore();
 
   useEffect(() => {
     initializeAuth();
   }, []);
 
-  return <div>{children}</div>;
+  if (loadingUser && !user) {
+    return <Loader />;
+  }
+
+  return <>{children}</>;
 };
 
 export default AuthGuard;

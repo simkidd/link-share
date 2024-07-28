@@ -5,6 +5,7 @@ import { useAuthStore } from "@/stores/auth.store";
 import { useLinkStore } from "@/stores/link.store";
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import {
   FaArrowRight,
   FaCodepen,
@@ -14,10 +15,26 @@ import {
   FaLinkedin,
   FaYoutube,
 } from "react-icons/fa6";
+import SkeletonMockup from "./SkeletonMockup";
 
 const PhoneMockup = () => {
-  const { links } = useLinkStore();
-  const { user, loading } = useAuthStore();
+  const { links, fetchLinks } = useLinkStore();
+  const { user } = useAuthStore();
+  const [isLoading, setIsLoading] = useState(true);
+  const [isFetching, setIsFetching] = useState(true);
+
+  useEffect(() => {
+    setIsLoading(false);
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsFetching(true);
+      await fetchLinks();
+      setIsFetching(false);
+    };
+    fetchData();
+  }, [fetchLinks]);
 
   return (
     <div className="w-full flex justify-center py-[100px]">
@@ -30,8 +47,8 @@ const PhoneMockup = () => {
           className="absolute inset-0"
         />
         <div className="absolute inset-[24px] inset-x-5 overflow-auto scrollbar-phone p-4 py-10 mt-[20px] mb-[2px]">
-          {loading ? (
-            <div>Loading...</div>
+          {isLoading ? (
+            <SkeletonMockup />
           ) : user ? (
             <>
               <div className="flex flex-col items-center mb-14">
@@ -59,25 +76,42 @@ const PhoneMockup = () => {
                 <p className="text-sm text-gray-500">{user.email}</p>
               </div>
               <div className="space-y-4">
-                {links.map((link) => (
-                  <div
-                    key={link.id}
-                    className={`relative p-3 px-4 rounded-lg w-full flex justify-between items-center text-white text-sm ${platformColor(
-                      link.platform
-                    )}`}
-                  >
-                    <span className="flex gap-2 items-center">
-                      {renderIconByPlatform(link.platform)}
-                      <span>{link.platform}</span>
-                    </span>
-                    <FaArrowRight className="ml-2" size={13} />
-                  </div>
-                ))}
+                {isFetching ? (
+                  <>
+                    {[1, 2, 3].map((_, index) => (
+                      <div
+                        key={index}
+                        className="relative p-3 px-4 rounded-lg w-full flex justify-between items-center text-white text-sm bg-gray-300"
+                      >
+                        <span className="flex gap-2 items-center">
+                          <div className="h-4 w-4 rounded-full"></div>
+                          <div className="h-4 rounded w-1/4"></div>
+                        </span>
+                        <div className="h-4 w-4 rounded-full ml-2"></div>
+                      </div>
+                    ))}
+                  </>
+                ) : (
+                  links.map((link) => (
+                    <div
+                      key={link.id}
+                      className={`relative p-3 px-4 rounded-lg w-full flex justify-between items-center text-white text-sm ${platformColor(
+                        link.platform
+                      )}`}
+                    >
+                      <span className="flex gap-2 items-center">
+                        {renderIconByPlatform(link.platform)}
+                        <span>{link.platform}</span>
+                      </span>
+                      <FaArrowRight className="ml-2" size={13} />
+                    </div>
+                  ))
+                )}
               </div>
             </>
           ) : (
-            <div className="flex flex-col">
-              <div className="flex justify-center flex-col items-center bg-[#FAFAFA] py-16 rounded-xl">
+            <div className="flex flex-col h-full">
+              <div className="flex justify-center flex-col items-center bg-[#FAFAFA] py-16 rounded-xl mb-8">
                 <Image
                   src="/icons/devlink-logo.png"
                   alt="solar link cirlce"
@@ -90,7 +124,7 @@ const PhoneMockup = () => {
                   Sign in an account to get you started
                 </h3>
               </div>
-              <Link href="/login">
+              <Link href="/login" className="mt-auto">
                 <Button className="w-full">Login</Button>
               </Link>
             </div>

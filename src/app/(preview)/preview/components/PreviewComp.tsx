@@ -1,7 +1,10 @@
 "use client";
+import { Link } from "@/interfaces/link.interface";
 import { useAuthStore } from "@/stores/auth.store";
 import { useLinkStore } from "@/stores/link.store";
+import { User } from "firebase/auth";
 import Image from "next/image";
+import { useEffect, useState } from "react";
 import {
   FaArrowRight,
   FaCodepen,
@@ -11,13 +14,25 @@ import {
   FaLinkedin,
   FaYoutube,
 } from "react-icons/fa6";
+import { toast } from "sonner";
 
-const PreviewComp = () => {
-  const { links } = useLinkStore();
-  const { user, loading } = useAuthStore();
+const PreviewComp: React.FC<{
+  links: Link[];
+  user: User;
+}> = ({ links, user }) => {
+  const copyLinkUrl = (link: Link) => {
+    navigator.clipboard
+      .writeText(link.url)
+      .then(() =>
+        toast.info(`${link.platform} Copied to clipboard`, {
+          icon: renderIconByPlatform(link.platform),
+        })
+      )
+      .catch((err) => toast.error("Failed to copy link"));
+  };
 
   return (
-    <div>
+    <div className="w-[350px] mx-auto px-14 py-12 rounded-3xl shadow-lg">
       <div className="flex flex-col items-center mb-14">
         <div className="h-[120px] w-[120px] rounded-full mb-6 overflow-hidden border-4 ">
           <Image
@@ -35,18 +50,19 @@ const PreviewComp = () => {
       </div>
       <div className="space-y-4">
         {links.map((link) => (
-          <div
+          <button
             key={link.id}
             className={`relative p-3 px-4 rounded-lg w-full flex justify-between items-center text-white text-sm ${platformColor(
               link.platform
             )}`}
+            onClick={() => copyLinkUrl(link)}
           >
             <span className="flex gap-2 items-center">
               {renderIconByPlatform(link.platform)}
               <span>{link.platform}</span>
             </span>
             <FaArrowRight className="ml-2" size={13} />
-          </div>
+          </button>
         ))}
       </div>
     </div>

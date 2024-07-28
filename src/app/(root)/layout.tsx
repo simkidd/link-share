@@ -7,6 +7,7 @@ import { Suspense } from "react";
 import { Providers } from "../providers";
 import Header from "@/components/Header";
 import PhoneMockup from "./components/PhoneMockup";
+import Loader from "@/components/Loader";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -33,9 +34,9 @@ export default function RootLayout({
           easing="ease"
           speed={200}
         />
-        <Toaster position="top-right" richColors theme="system" />
+        <Toaster position="top-right" richColors theme="system" closeButton />
         <Providers>
-          <Suspense fallback={<div>Loading...</div>}>
+          <Suspense fallback={<Loader />}>
             <Header />
             <div className="bg-gray-50 min-h-dvh">
               <div className="container mx-auto px-2 md:px-0 grid lg:grid-cols-5 grid-cols-1 gap-6 py-6 md:pt-0">

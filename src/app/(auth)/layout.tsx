@@ -7,6 +7,7 @@ import Logo from "@/components/Logo";
 import NextTopLoader from "nextjs-toploader";
 import { Suspense } from "react";
 import { Providers } from "../providers";
+import Loader from "@/components/Loader";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -34,20 +35,19 @@ export default function AuthLayout({
           speed={200}
         />
         <Toaster position="top-right" richColors theme="system" />
-        <Providers>
-          <Suspense fallback={<div>Loading...</div>}>
-            <div className="md:bg-gray-50 bg-white">
-              <div className="flex flex-col items-center md:justify-center min-h-screen md:py-12 py-8 container mx-auto px-2">
-                <Link href="/">
-                  <Logo />
-                </Link>
-                <div className="bg-white rounded-xl md:shadow-sm md:w-[500px] w-full md:px-10 px-5 md:py-10 py-3 mt-[50px]">
-                  {children}
-                </div>
+
+        <Suspense fallback={<Loader />}>
+          <div className="md:bg-gray-50 bg-white">
+            <div className="flex flex-col items-center md:justify-center min-h-screen md:py-12 py-8 container mx-auto px-2">
+              <Link href="/">
+                <Logo />
+              </Link>
+              <div className="bg-white rounded-xl md:shadow-sm md:w-[500px] w-full md:px-10 px-5 md:py-10 py-3 mt-[50px]">
+                {children}
               </div>
             </div>
-          </Suspense>
-        </Providers>
+          </div>
+        </Suspense>
       </body>
     </html>
   );

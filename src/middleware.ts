@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { TOKEN_NAME } from "./utils/constants";
+import { auth } from "@/utils/firebaseConfig";
 
 const authRoutes = ["/login", "/sign-up"];
-const privateRoutes = ["/?links", "/profile", "/preview"];
+const privateRoutes = ["/links", "/profile"];
+const publicRoutes = ["/preview"];
 
 export default async function middleware(req: NextRequest) {
   // Check if the current route is protected or public
@@ -11,19 +13,17 @@ export default async function middleware(req: NextRequest) {
   const isAuthRoute = authRoutes.some((route) => path.startsWith(route));
   const isPrivateRoute = privateRoutes.some((route) => path.startsWith(route));
 
-  const cookie = cookies().get(TOKEN_NAME)?.value;
+  const token = cookies().get(TOKEN_NAME)?.value;
 
   // Redirect to homepage if the user is authenticated and trying to access auth routes
-  if (isAuthRoute && cookie) {
-    return NextResponse.redirect(new URL("/?links", req.nextUrl));
+  if (isAuthRoute && token) {
+    return NextResponse.redirect(new URL("/editor", req.nextUrl));
   }
 
   // Redirect to /login if the user is not authenticated
-  if (isPrivateRoute && !cookie) {
+  if (isPrivateRoute && !token) {
     return NextResponse.redirect(new URL("/login", req.nextUrl));
   }
-
-  
 
   return NextResponse.next();
 }
