@@ -6,7 +6,6 @@ import {
   UpdateLinkInput,
 } from "@/interfaces/link.interface";
 import { useLinkStore } from "@/stores/link.store";
-import Image from "next/image";
 import { useEffect, useState } from "react";
 import { FaTimesCircle } from "react-icons/fa";
 import {
@@ -19,11 +18,11 @@ import {
   FaPlus,
   FaYoutube,
 } from "react-icons/fa6";
+import * as Yup from "yup";
 import Button from "../../../components/ui/Button";
 import Select from "../../../components/ui/Select";
-import SkeletonLinkItem from "./SkeletonLinkItem";
-import * as Yup from "yup";
 import Placeholder from "./Placeholder";
+import SkeletonLinkItem from "./SkeletonLinkItem";
 
 const platforms = [
   { value: "GitHub", label: "GitHub", icon: <FaGithub /> },

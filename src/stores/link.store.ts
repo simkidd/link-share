@@ -27,7 +27,7 @@ interface ILinkStore {
   updateLink: (input: UpdateLinkInput) => Promise<void>;
   deleteLink: (id: string) => Promise<void>;
   fetchLinks: () => Promise<void>;
-  fetchUserData: (uid: string) => Promise<void>;
+  
 }
 
 export const useLinkStore = create<ILinkStore>((set) => ({
@@ -138,28 +138,5 @@ export const useLinkStore = create<ILinkStore>((set) => ({
       set({ loading: false });
     }
   },
-  fetchUserData: async (uid) => {
-    try {
-      set({ loading: true });
-      const userDocRef = doc(db, "users", uid);
-      const userDoc = await getDoc(userDocRef);
-
-      if (userDoc.exists()) {
-        set({ userInfo: userDoc.data() });
-      }
-
-      const linksCollectionRef = collection(db, "users", uid, "links");
-      const linksSnapshot = await getDocs(linksCollectionRef);
-      const userLinks = linksSnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...(doc.data() as Omit<Link, "id">),
-      }));
-
-      set({ links: userLinks });
-    } catch (error) {
-      console.log(error);
-    } finally {
-      set({ loading: false });
-    }
-  },
+  
 }));

@@ -10,38 +10,37 @@ interface IPreview {
   params: { id: string };
 }
 
-// export const generateMetadata = async ({
-//   params,
-// }: IPreview): Promise<Metadata> => {
-//   console.log("preview page>>>", params.id)
-//   const uid = params.id;
-//   // const user = await fetchUserData(uid);
+export const generateMetadata = async ({
+  params,
+}: IPreview): Promise<Metadata> => {
+  const uid = params.id;
+  const user = (await fetchUserData(uid)) as User;
 
-//   return {
-//     title: user?.name,
-//     // description: user?.description,
-//     alternates: {
-//       canonical: `/user/${user?.uid}`,
-//     },
-//     openGraph: {
-//       title: user?.name,
-//       // description: user?.description,
-//       // images: [user?.images[0].url || ""],
-//     },
-//   };
-// };
+  return {
+    title: user?.displayName,
+    // description: user?.description,
+    alternates: {
+      canonical: `/preview/${user?.uid}`,
+    },
+    openGraph: {
+      title: user?.displayName || "",
+      // description: user?.description,
+      images: [user?.photoUrl || ""],
+    },
+  };
+};
 
 const PreviewPage = async ({ params }: IPreview) => {
   const user = (await fetchUserData(params.id)) as User as any;
   const links = (await fetchUserLinks(params.id)) as Link[];
 
-  // if (!user) {
-  //   notFound();
-  // }
+  if (!user) {
+    notFound();
+  }
 
   return (
     <div className="w-full">
-      <PreviewHeader />
+      <PreviewHeader user={user} />
 
       <div className="py-[60px] container mx-auto px-2">
         <PreviewComp user={user} links={links} />
