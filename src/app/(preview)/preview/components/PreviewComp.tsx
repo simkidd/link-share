@@ -21,7 +21,7 @@ const PreviewComp: React.FC<{
     navigator.clipboard
       .writeText(link.url)
       .then(() =>
-        toast.info(`${link.platform} Copied to clipboard`, {
+        toast.info(`${link.platform} copied to clipboard`, {
           icon: renderIconByPlatform(link.platform),
         })
       )

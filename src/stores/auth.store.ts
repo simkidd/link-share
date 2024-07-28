@@ -11,7 +11,7 @@ import {
   signOut,
   updateProfile,
 } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import Cookies from "js-cookie";
 import { toast } from "sonner";
 import { create } from "zustand";
@@ -26,6 +26,7 @@ interface IAuthStore {
   logout: () => void;
   initializeAuth: () => void;
   updateUserProfile: (profile: Partial<User>) => Promise<void>;
+  fetchUserData: (uid: string) => Promise<void>;
 }
 
 const getFirebaseErrorMessage = (error: FirebaseError) => {
@@ -114,7 +115,7 @@ export const useAuthStore = create<IAuthStore>((set) => ({
       const token = await user.getIdToken();
       Cookies.set(TOKEN_NAME, token);
       toast.success("Login Successful");
-      window.location.href = "/links";
+      window.location.href = "/editor";
     } catch (error) {
       console.log(error);
       const errorMsg = getFirebaseErrorMessage(error as FirebaseError);
@@ -167,7 +168,6 @@ export const useAuthStore = create<IAuthStore>((set) => ({
             },
           });
 
-          console.log("intialize from store>>>");
         } else {
           Cookies.remove(TOKEN_NAME);
           set({ user: null });
@@ -180,6 +180,21 @@ export const useAuthStore = create<IAuthStore>((set) => ({
       };
     } catch (error) {
       console.log(error);
+    }
+  },
+  fetchUserData: async (uid) => {
+    try {
+      set({ loading: true });
+      const userDocRef = doc(db, "users", uid);
+      const userDoc = await getDoc(userDocRef);
+
+      if (userDoc.exists()) {
+        set({ user: userDoc.data() as User });
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      set({ loading: false });
     }
   },
 }));

@@ -5,6 +5,7 @@ export const fetchUserData = async (uid: string) => {
   try {
     const userDocRef = doc(db, "users", uid);
     const userDoc = await getDoc(userDocRef);
+    
     if (userDoc.exists()) {
       return userDoc.data();
     } else {
