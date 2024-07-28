@@ -1,10 +1,7 @@
 "use client";
 import { Link } from "@/interfaces/link.interface";
-import { useAuthStore } from "@/stores/auth.store";
-import { useLinkStore } from "@/stores/link.store";
 import { User } from "firebase/auth";
 import Image from "next/image";
-import { useEffect, useState } from "react";
 import {
   FaArrowRight,
   FaCodepen,

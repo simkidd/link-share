@@ -1,7 +1,7 @@
 import { CreateUserInput, LoginUserInput } from "@/interfaces/auth.interface";
 import { User } from "@/interfaces/user.interface";
 import { TOKEN_NAME } from "@/utils/constants";
-import { auth } from "@/utils/firebaseConfig";
+import { auth, db } from "@/utils/firebaseConfig";
 import { generateDisplayName } from "@/utils/helpers";
 import { FirebaseError } from "firebase/app";
 import {
@@ -11,6 +11,7 @@ import {
   signOut,
   updateProfile,
 } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
 import Cookies from "js-cookie";
 import { toast } from "sonner";
 import { create } from "zustand";
@@ -66,20 +67,22 @@ export const useAuthStore = create<IAuthStore>((set) => ({
         input.password
       );
 
-      set({
-        user: {
-          uid: user.uid,
-          email: user.email || "",
-          displayName: user.displayName || "",
-          photoUrl: user.photoURL || "",
-        },
-      });
+      const displayName = generateDisplayName(input.email);
+      await updateProfile(user, { displayName });
+
+      const userData: User = {
+        uid: user.uid,
+        email: user.email || "",
+        displayName: user.displayName || "",
+        photoUrl: user.photoURL || "",
+      };
+
+      await setDoc(doc(db, "users", user.uid), userData);
+
+      set({ user: userData });
 
       const token = await user.getIdToken();
       Cookies.set(TOKEN_NAME, token);
-
-      const displayName = generateDisplayName(input.email);
-      await updateProfile(user, { displayName });
 
       toast.success("Account Created Successfully");
       window.location.href = "/login";
