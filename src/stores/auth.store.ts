@@ -9,7 +9,7 @@ import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
   signOut,
-  updateProfile
+  updateProfile,
 } from "firebase/auth";
 import Cookies from "js-cookie";
 import { toast } from "sonner";
@@ -17,6 +17,7 @@ import { create } from "zustand";
 
 interface IAuthStore {
   loading: boolean;
+  loadingUser: boolean;
   user: User | null;
   setUser: (user: User) => void;
   createUser: (input: CreateUserInput) => Promise<void>;
@@ -53,22 +54,35 @@ const getFirebaseErrorMessage = (error: FirebaseError) => {
 
 export const useAuthStore = create<IAuthStore>((set) => ({
   loading: false,
+  loadingUser: false,
   user: null,
   setUser: (user: User) => set({ user }),
   createUser: async (input) => {
     try {
       set({ loading: true });
-      await createUserWithEmailAndPassword(auth, input.email, input.password)
-        .then(async (res) => {
-          if (res.user) {
-            const displayName = generateDisplayName(input.email);
-            await updateProfile(res.user, { displayName });
-            toast.success("Account Created Successfully");
-          }
-        })
-        .finally(() => {
-          window.location.href = "/login";
-        });
+      const { user } = await createUserWithEmailAndPassword(
+        auth,
+        input.email,
+        input.password
+      );
+
+      set({
+        user: {
+          uid: user.uid,
+          email: user.email || "",
+          displayName: user.displayName || "",
+          photoUrl: user.photoURL || "",
+        },
+      });
+
+      const token = await user.getIdToken();
+      Cookies.set(TOKEN_NAME, token);
+
+      const displayName = generateDisplayName(input.email);
+      await updateProfile(user, { displayName });
+
+      toast.success("Account Created Successfully");
+      window.location.href = "/login";
     } catch (error) {
       console.log(error);
       const errorMsg = getFirebaseErrorMessage(error as FirebaseError);
@@ -80,14 +94,24 @@ export const useAuthStore = create<IAuthStore>((set) => ({
   login: async (input) => {
     try {
       set({ loading: true });
-      await signInWithEmailAndPassword(auth, input.email, input.password).then(
-        (res) => {
-          if (res.user) {
-            toast.success("Login Successful");
-            window.location.href = "/";
-          }
-        }
+      const { user } = await signInWithEmailAndPassword(
+        auth,
+        input.email,
+        input.password
       );
+      set({
+        user: {
+          uid: user.uid,
+          email: user.email || "",
+          displayName: user.displayName || "",
+          photoUrl: user.photoURL || "",
+        },
+      });
+
+      const token = await user.getIdToken();
+      Cookies.set(TOKEN_NAME, token);
+      toast.success("Login Successful");
+      window.location.href = "/links";
     } catch (error) {
       console.log(error);
       const errorMsg = getFirebaseErrorMessage(error as FirebaseError);
@@ -101,27 +125,6 @@ export const useAuthStore = create<IAuthStore>((set) => ({
     Cookies.remove(TOKEN_NAME);
     await signOut(auth);
     set({ user: null });
-  },
-  initializeAuth: () => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        const token = await user.getIdToken();
-        Cookies.set(TOKEN_NAME, token);
-        set({
-          user: {
-            uid: user.uid,
-            email: user.email || "",
-            displayName: user.displayName || "",
-            photoUrl: user.photoURL || "",
-          },
-        });
-      } else {
-        Cookies.remove(TOKEN_NAME);
-        set({ user: null });
-      }
-    });
-
-    return () => unsubscribe();
   },
   updateUserProfile: async (profile) => {
     try {
@@ -145,6 +148,35 @@ export const useAuthStore = create<IAuthStore>((set) => ({
       toast.error(errorMsg);
     } finally {
       set({ loading: false });
+    }
+  },
+  initializeAuth: () => {
+    try {
+      set({ loadingUser: true });
+      const unsubscribe = onAuthStateChanged(auth, async (user) => {
+        if (user) {
+          set({
+            user: {
+              uid: user.uid,
+              email: user.email || "",
+              displayName: user.displayName || "",
+              photoUrl: user.photoURL || "",
+            },
+          });
+
+          console.log("intialize from store>>>");
+        } else {
+          Cookies.remove(TOKEN_NAME);
+          set({ user: null });
+        }
+      });
+
+      return () => {
+        unsubscribe();
+        set({ loadingUser: false });
+      };
+    } catch (error) {
+      console.log(error);
     }
   },
 }));

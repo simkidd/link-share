@@ -12,6 +12,7 @@ import {
   updateDoc,
   deleteDoc,
   doc,
+  getDoc,
 } from "firebase/firestore";
 import { toast } from "sonner";
 
@@ -19,18 +20,23 @@ interface ILinkStore {
   loading: boolean;
   loadingSave: boolean;
   links: Link[];
+  userInfo: any | null;
   setLinks: (links: Link[]) => void;
+  setUserInfo: (info: any) => void;
   addLink: (input: CreateLinkInput) => Promise<void>;
   updateLink: (input: UpdateLinkInput) => Promise<void>;
   deleteLink: (id: string) => Promise<void>;
   fetchLinks: () => Promise<void>;
+  fetchUserData: (uid: string) => Promise<void>;
 }
 
 export const useLinkStore = create<ILinkStore>((set) => ({
   loading: false,
   loadingSave: false,
   links: [],
+  userInfo: null,
   setLinks: (links: Link[]) => set({ links }),
+  setUserInfo: (info: any) => set({ userInfo: info }),
   addLink: async (input) => {
     try {
       set({ loadingSave: true });
@@ -126,6 +132,30 @@ export const useLinkStore = create<ILinkStore>((set) => ({
         ...doc.data(),
       })) as Link[];
       set({ links });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      set({ loading: false });
+    }
+  },
+  fetchUserData: async (uid) => {
+    try {
+      set({ loading: true });
+      const userDocRef = doc(db, "users", uid);
+      const userDoc = await getDoc(userDocRef);
+
+      if (userDoc.exists()) {
+        set({ userInfo: userDoc.data() });
+      }
+
+      const linksCollectionRef = collection(db, "users", uid, "links");
+      const linksSnapshot = await getDocs(linksCollectionRef);
+      const userLinks = linksSnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...(doc.data() as Omit<Link, "id">),
+      }));
+
+      set({ links: userLinks });
     } catch (error) {
       console.log(error);
     } finally {

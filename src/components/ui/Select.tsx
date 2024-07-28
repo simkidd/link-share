@@ -29,7 +29,10 @@ const Select: React.FC<SelectProps> = ({
   };
 
   const handleClickOutside = (event: MouseEvent) => {
-    if (selectRef.current && !selectRef.current.contains(event.target as Node)) {
+    if (
+      selectRef.current &&
+      !selectRef.current.contains(event.target as Node)
+    ) {
       setIsOpen(false);
     }
   };
@@ -47,7 +50,9 @@ const Select: React.FC<SelectProps> = ({
     <div className="relative w-full" ref={selectRef}>
       <button
         type="button"
-        className="p-2 px-4 mt-1 border border-gray-300 bg-white rounded-lg w-full text-left flex items-center justify-between"
+        className={`p-2 px-4 mt-1 border bg-white rounded-lg w-full text-left flex items-center justify-between ${
+          isOpen ? "border-indigo-500" : "border-gray-300"
+        }`}
         onClick={() => setIsOpen(!isOpen)}
       >
         {selectedOption ? (

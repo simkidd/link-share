@@ -6,21 +6,24 @@ import {
   UpdateLinkInput,
 } from "@/interfaces/link.interface";
 import { useLinkStore } from "@/stores/link.store";
-import React, { useState, useEffect } from "react";
-import Button from "../../../components/ui/Button";
-import Select from "../../../components/ui/Select";
 import Image from "next/image";
+import { useEffect, useState } from "react";
+import { FaTimesCircle } from "react-icons/fa";
 import {
+  FaCodepen,
+  FaFacebook,
   FaGithub,
+  FaLink,
+  FaLinkedin,
+  FaPenToSquare,
   FaPlus,
   FaYoutube,
-  FaLinkedin,
-  FaFacebook,
-  FaCodepen,
-  FaLink,
-  FaPenToSquare,
 } from "react-icons/fa6";
-import { FaPenSquare, FaTimesCircle } from "react-icons/fa";
+import Button from "../../../components/ui/Button";
+import Select from "../../../components/ui/Select";
+import SkeletonLinkItem from "./SkeletonLinkItem";
+import * as Yup from "yup";
+import Placeholder from "./Placeholder";
 
 const platforms = [
   { value: "GitHub", label: "GitHub", icon: <FaGithub /> },
@@ -29,6 +32,14 @@ const platforms = [
   { value: "Facebook", label: "Facebook", icon: <FaFacebook /> },
   { value: "Frontend Mentor", label: "Frontend Mentor", icon: <FaCodepen /> },
 ];
+
+const urlSchema = Yup.string().url("Invalid URL").required("URL is required");
+
+interface ValidationError {
+  index?: number;
+  id?: string;
+  errors: string[];
+}
 
 const LinkList = () => {
   const {
@@ -42,9 +53,18 @@ const LinkList = () => {
   } = useLinkStore();
   const [newLinks, setNewLinks] = useState<CreateLinkInput[]>([]);
   const [editingLinks, setEditingLinks] = useState<UpdateLinkInput[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [validationErrors, setValidationErrors] = useState<ValidationError[]>(
+    []
+  );
 
   useEffect(() => {
-    fetchLinks();
+    const fetchData = async () => {
+      setIsLoading(true);
+      await fetchLinks();
+      setIsLoading(false);
+    };
+    fetchData();
   }, [fetchLinks]);
 
   const handleAddLinkForm = () => {
@@ -52,6 +72,46 @@ const LinkList = () => {
   };
 
   const handleSaveLinks = async () => {
+    const errors: ValidationError[] = [];
+
+    for (let index = 0; index < newLinks.length; index++) {
+      const link = newLinks[index];
+      try {
+        await urlSchema.validate(link.url, { abortEarly: false });
+      } catch (err) {
+        if (err instanceof Yup.ValidationError) {
+          errors.push({
+            index,
+            errors: err.errors,
+          });
+        }
+      }
+    }
+
+    for (let i = 0; i < editingLinks.length; i++) {
+      const link = editingLinks[i];
+      try {
+        await urlSchema.validate(link.url, { abortEarly: false });
+      } catch (err) {
+        if (err instanceof Yup.ValidationError) {
+          errors.push({
+            id: link.id,
+            errors: err.errors,
+          });
+        }
+      }
+    }
+
+    if (errors.length > 0) {
+      setValidationErrors(errors);
+      return;
+    }
+
+    if (errors.length > 0) {
+      setValidationErrors(errors);
+      return;
+    }
+
     const saveNewLinksPromises = newLinks
       .filter((link) => link.platform && link.url)
       .map((link) => addLink(link));
@@ -64,6 +124,7 @@ const LinkList = () => {
 
     setNewLinks([]);
     setEditingLinks([]);
+    setValidationErrors([]); // Clear errors after successful save
     fetchLinks(); // Refresh the list after saving
   };
 
@@ -79,6 +140,7 @@ const LinkList = () => {
   };
 
   const handleRemoveNewLink = (index: number) => {
+    setValidationErrors([]);
     setNewLinks(newLinks.filter((_, i) => i !== index));
   };
 
@@ -101,6 +163,7 @@ const LinkList = () => {
 
   const handleDeleteLink = async (id: string) => {
     await deleteLink(id);
+    setValidationErrors([]);
     fetchLinks(); // Refresh the list after deleting
   };
 
@@ -127,154 +190,178 @@ const LinkList = () => {
         </Button>
       </div>
 
-      <div className="my-6 lg:px-10 md:px-6 px-4">
-        {links.length === 0 && newLinks.length === 0 && (
-          <div className="flex justify-center flex-col items-center bg-[#FAFAFA] py-16 lg:px-[100px] md:px-12 px-8 rounded-xl">
-            <Image
-              src="/images/Group 273.png"
-              alt="vector"
-              height={250}
-              width={250}
-              className="md:w-[249px] w-[130px]"
-            />
-            <h3 className="font-bold md:text-[32px] text-2xl text-[#333333] pt-10 pb-6">
-              Let's Get you Started
-            </h3>
-            <p className="font-normal text-base text-[#737373] text-center">
-              Use the “Add new link” button to get started. Once you have more
-              than one link, you can reorder and edit them. We’re here to help
-              you share your profiles with everyone!
-            </p>
-          </div>
-        )}
-        <ul className="w-full space-y-6">
-          {links.map((link, index) => (
-            <li
-              key={link.id}
-              className="p-5 bg-[#fafafa] border-gray-100 border rounded-xl"
-            >
-              <div className="flex justify-between items-center mb-3">
-                <span className="text-base font-bold">Link #{index + 1}</span>
-                <div className="flex items-center gap-2">
+      {isLoading ? (
+        <div className="my-6 lg:px-10 md:px-6 px-4">
+          <SkeletonLinkItem />
+        </div>
+      ) : (
+        <div className="my-6 lg:px-10 md:px-6 px-4">
+          {links.length === 0 && newLinks.length === 0 && (
+            <>
+              <Placeholder />
+            </>
+          )}
+          <ul className="w-full space-y-6">
+            {links.map((link, index) => (
+              <li
+                key={link.id}
+                className="p-5 bg-[#fafafa] border-gray-100 border rounded-xl"
+              >
+                <div className="flex justify-between items-center mb-3">
+                  <span className="text-base font-bold">Link #{index + 1}</span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleEditLink(link)}
+                      className="text-primary flex items-center gap-1 text-base"
+                    >
+                      <FaPenToSquare />
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDeleteLink(link.id)}
+                      className="text-red-500 flex items-center gap-1 text-base"
+                    >
+                      <FaTimesCircle />
+                      Remove
+                    </button>
+                  </div>
+                </div>
+                {editingLinks.find((editLink) => editLink.id === link.id) ? (
+                  <>
+                    <label className="flex flex-col text-[12px]">
+                      Platform
+                    </label>
+                    <div className="mb-3">
+                      <Select
+                        options={platforms}
+                        value={
+                          editingLinks.find(
+                            (editLink) => editLink.id === link.id
+                          )?.platform || ""
+                        }
+                        onChange={(value) =>
+                          handleChangeEditing(link.id, "platform", value)
+                        }
+                      />
+                    </div>
+
+                    <label className="flex flex-col text-[12px]">Link</label>
+                    <div className="relative mt-1">
+                      <FaLink className="absolute left-4 top-1/2 transform -translate-y-1/2" />
+                      <input
+                        type="text"
+                        value={
+                          editingLinks.find(
+                            (editLink) => editLink.id === link.id
+                          )?.url || ""
+                        }
+                        onChange={(e) =>
+                          handleChangeEditing(link.id, "url", e.target.value)
+                        }
+                        placeholder="https://yourlink.com"
+                        className={`p-2 pl-10 border border-gray-300 focus:outline-none focus:border-indigo-500 rounded-lg w-full ${
+                          validationErrors.some((error) => error.id === link.id)
+                            ? "border-red-500"
+                            : ""
+                        }`}
+                      />
+
+                      {validationErrors.find(
+                        (error) => error.id === link.id
+                      ) && (
+                        <p className="text-red-500 text-sm absolute right-4 top-1/2 transform -translate-y-1/2">
+                          {validationErrors
+                            .find((error) => error.id === link.id)
+                            ?.errors.join(", ")}
+                        </p>
+                      )}
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <label className="flex flex-col text-[12px]">
+                      Platform
+                    </label>
+                    <div className="relative mb-3 mt-1">
+                      {renderIconByPlatform(link.platform)}
+                      <input
+                        type="text"
+                        value={link.platform}
+                        className="p-2 pl-10 border border-gray-300 rounded-lg w-full focus:outline-none text-gray-500"
+                        readOnly
+                      />
+                    </div>
+
+                    <label className="flex flex-col text-[12px]">Link</label>
+                    <div className="relative mt-1">
+                      <FaLink className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500" />
+                      <input
+                        type="text"
+                        value={link.url}
+                        className="p-2 pl-10 border border-gray-300 rounded-lg w-full focus:outline-none text-gray-500"
+                        readOnly
+                      />
+                    </div>
+                  </>
+                )}
+              </li>
+            ))}
+            {/* adding new link */}
+            {newLinks.map((link, index) => (
+              <li
+                key={index}
+                className="flex flex-col mb-4 p-4 border bg-[#fafafa] border-gray-100 rounded-xl"
+              >
+                <div className="flex justify-between items-center mb-3">
+                  <span className="text-base font-bold">
+                    Link #{links.length + index + 1}
+                  </span>
                   <button
-                    onClick={() => handleEditLink(link)}
-                    className="text-primary flex items-center gap-1 text-base"
-                  >
-                    <FaPenToSquare />
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDeleteLink(link.id)}
+                    onClick={() => handleRemoveNewLink(index)}
                     className="text-red-500 flex items-center gap-1 text-base"
                   >
                     <FaTimesCircle />
                     Remove
                   </button>
                 </div>
-              </div>
-              {editingLinks.find((editLink) => editLink.id === link.id) ? (
-                <>
-                  <label className="flex flex-col text-[12px]">Platform</label>
-                  <div className="mb-3">
-                    <Select
-                      options={platforms}
-                      value={
-                        editingLinks.find((editLink) => editLink.id === link.id)
-                          ?.platform || ""
-                      }
-                      onChange={(value) =>
-                        handleChangeEditing(link.id, "platform", value)
-                      }
-                    />
-                  </div>
+                <label className="flex flex-col text-[12px]">Platform</label>
+                <div className="mb-3">
+                  <Select
+                    options={platforms}
+                    value={link.platform}
+                    onChange={(e) => handleChangeNew(index, "platform", e)}
+                  />
+                </div>
+                <label className="flex flex-col text-[12px]">Link</label>
+                <div className="relative mt-1">
+                  <FaLink className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-700" />
+                  <input
+                    type="text"
+                    value={link.url}
+                    onChange={(e) =>
+                      handleChangeNew(index, "url", e.target.value)
+                    }
+                    placeholder="https://www.example.com"
+                    className={`p-2 pl-10 border border-gray-300 focus:outline-none focus:border-indigo-500 rounded-lg w-full ${
+                      validationErrors.some((error) => error.index === index)
+                        ? "border-red-500"
+                        : ""
+                    }`}
+                  />
 
-                  <label className="flex flex-col text-[12px]">Link</label>
-                  <div className="relative mt-1">
-                    <FaLink className="absolute left-4 top-1/2 transform -translate-y-1/2" />
-                    <input
-                      type="text"
-                      value={
-                        editingLinks.find((editLink) => editLink.id === link.id)
-                          ?.url || ""
-                      }
-                      onChange={(e) =>
-                        handleChangeEditing(link.id, "url", e.target.value)
-                      }
-                      placeholder="https://www.example.com"
-                      className="p-2 pl-10 border border-gray-300 rounded-lg w-full"
-                    />
-                  </div>
-                </>
-              ) : (
-                <>
-                  <label className="flex flex-col text-[12px]">Platform</label>
-                  <div className="relative mb-3 mt-1">
-                    {renderIconByPlatform(link.platform)}
-                    <input
-                      type="text"
-                      value={link.platform}
-                      className="p-2 pl-10 border border-gray-300 rounded-lg w-full focus:outline-none text-gray-500"
-                      readOnly
-                    />
-                  </div>
-
-                  <label className="flex flex-col text-[12px]">Link</label>
-                  <div className="relative mt-1">
-                    <FaLink className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500" />
-                    <input
-                      type="text"
-                      value={link.url}
-                      className="p-2 pl-10 border border-gray-300 rounded-lg w-full focus:outline-none text-gray-500"
-                      readOnly
-                    />
-                  </div>
-                </>
-              )}
-            </li>
-          ))}
-          {/* adding new link */}
-          {newLinks.map((link, index) => (
-            <li
-              key={index}
-              className="flex flex-col mb-4 p-4 border bg-[#fafafa] border-gray-100 rounded-xl"
-            >
-              <div className="flex justify-between items-center mb-3">
-                <span className="text-base font-bold">
-                  Link #{links.length + index + 1}
-                </span>
-                <button
-                  onClick={() => handleRemoveNewLink(index)}
-                  className="text-red-500 flex items-center gap-1 text-base"
-                >
-                  <FaTimesCircle />
-                  Remove
-                </button>
-              </div>
-              <label className="flex flex-col text-[12px]">Platform</label>
-              <div className="mb-3">
-                <Select
-                  options={platforms}
-                  value={link.platform}
-                  onChange={(e) => handleChangeNew(index, "platform", e)}
-                />
-              </div>
-              <label className="flex flex-col text-[12px]">Link</label>
-              <div className="relative mt-1">
-                <FaLink className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-700" />
-                <input
-                  type="text"
-                  value={link.url}
-                  onChange={(e) =>
-                    handleChangeNew(index, "url", e.target.value)
-                  }
-                  placeholder="https://www.example.com"
-                  className="p-2 pl-10 border border-gray-300 rounded-lg w-full"
-                />
-              </div>
-            </li>
-          ))}
-        </ul>
-      </div>
+                  {validationErrors.find((error) => error.index === index) && (
+                    <p className="text-red-500 text-sm absolute right-4 top-1/2 transform -translate-y-1/2">
+                      {validationErrors
+                        .find((error) => error.index === index)
+                        ?.errors.join(", ")}
+                    </p>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       <div className="w-full lg:px-10 md:px-6 px-4 border-t py-6 flex justify-end">
         {(newLinks.length > 0 || editingLinks.length > 0) && (
