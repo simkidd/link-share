@@ -27,9 +27,7 @@ const PreviewHeader: React.FC<{ user: User }> = ({ user }) => {
         </Link>
       ) : (
         <Link href="/login">
-          <Button onClick={copyPageUrl} variant="outline">
-            Login
-          </Button>
+          <Button variant="outline">Login</Button>
         </Link>
       )}
       <Button onClick={copyPageUrl} className="ms-auto">
