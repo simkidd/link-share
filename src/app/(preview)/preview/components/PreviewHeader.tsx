@@ -2,14 +2,12 @@
 import Button from "@/components/ui/Button";
 import { User } from "@/interfaces/user.interface";
 import { useAuthStore } from "@/stores/auth.store";
-import { auth } from "@/utils/firebaseConfig";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 const PreviewHeader: React.FC<{ user: User }> = ({ user }) => {
   const { user: authUser } = useAuthStore();
-  const { currentUser } = auth;
   const [pageUrl, setPageUrl] = useState("");
 
   useEffect(() => {
@@ -23,13 +21,17 @@ const PreviewHeader: React.FC<{ user: User }> = ({ user }) => {
 
   return (
     <div className="flex gap-4 items-center justify-between container mx-auto px-2 py-4">
-      {currentUser &&
-        currentUser?.uid === user?.uid &&
-        authUser?.uid === user?.uid && (
-          <Link href="/editor">
-            <Button variant="outline">Back to Editor</Button>
-          </Link>
-        )}
+      {authUser && authUser?.uid === user?.uid ? (
+        <Link href="/editor">
+          <Button variant="outline">Back to Editor</Button>
+        </Link>
+      ) : (
+        <Link href="/login">
+          <Button onClick={copyPageUrl} variant="outline">
+            Login
+          </Button>
+        </Link>
+      )}
       <Button onClick={copyPageUrl} className="ms-auto">
         Share Link
       </Button>
