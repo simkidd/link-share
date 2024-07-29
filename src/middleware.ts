@@ -4,7 +4,7 @@ import { TOKEN_NAME } from "./utils/constants";
 import { auth } from "@/utils/firebaseConfig";
 
 const authRoutes = ["/login", "/sign-up"];
-const privateRoutes = ["/links", "/profile"];
+const privateRoutes = ["/editor", "/profile"];
 const publicRoutes = ["/preview"];
 
 export default async function middleware(req: NextRequest) {
