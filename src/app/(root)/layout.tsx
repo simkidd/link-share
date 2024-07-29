@@ -1,15 +1,11 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "../globals.scss";
-import { Toaster } from "sonner";
+import Loader from "@/components/Loader";
+import { Metadata } from "next";
 import NextTopLoader from "nextjs-toploader";
 import { Suspense } from "react";
-import { Providers } from "../providers";
-import Header from "@/components/Header";
-import PhoneMockup from "./components/PhoneMockup";
-import Loader from "@/components/Loader";
-
-const inter = Inter({ subsets: ["latin"] });
+import { Toaster } from "sonner";
+import "../globals.scss";
+import Logo from "@/components/Logo";
+import Image from "next/image";
 
 export const metadata: Metadata = {
   title: "Link Sharing App",
@@ -23,7 +19,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body>
         <NextTopLoader
           color="#633CFF"
           initialPosition={0.08}
@@ -35,25 +31,30 @@ export default function RootLayout({
           speed={200}
         />
         <Toaster position="top-right" richColors theme="system" closeButton />
-        <Providers>
-          <Suspense fallback={<Loader />}>
-            <Header />
-            <div className="bg-gray-50 min-h-dvh">
-              <div className="container mx-auto px-2 md:px-0 grid lg:grid-cols-5 grid-cols-1 gap-6 py-6 md:pt-0">
-                <div className="col-span-2 hidden lg:flex">
-                  <div className="bg-white shadow-sm rounded-xl w-full">
-                    <PhoneMockup />
-                  </div>
-                </div>
-                <div className="lg:col-span-3 col-span-1">
-                  <div className="bg-white md:shadow-sm rounded-xl w-full h-full">
-                    {children}
-                  </div>
+        <Suspense fallback={<Loader />}>
+          <div className="md:bg-gray-50 bg-white min-h-screen">
+            <div className="w-full bg-gray-50 md:py-6">
+              <div className="container mx-auto px-4 py-4 flex items-center justify-between bg-white md:rounded-xl">
+                <div className="flex items-center gap-[10px]">
+                  <Image
+                    src="/icons/devlink-logo.png"
+                    alt="solar link cirlce"
+                    loading="lazy"
+                    width={40}
+                    height={40}
+                    className="object-contain"
+                  />
+                  <p className="font-bold md:text-[28px] text-[24px]">
+                    devlinks
+                  </p>
                 </div>
               </div>
             </div>
-          </Suspense>
-        </Providers>
+            <div className="bg-white rounded-xl md:shadow-sm md:w-[500px] w-full md:px-10 px-5 md:py-10 py-3 mt-[50px] mx-auto">
+              {children}
+            </div>
+          </div>
+        </Suspense>
       </body>
     </html>
   );

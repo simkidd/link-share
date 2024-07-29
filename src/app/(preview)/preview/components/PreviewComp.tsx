@@ -1,5 +1,6 @@
 "use client";
 import { Link } from "@/interfaces/link.interface";
+import { auth } from "@/utils/firebaseConfig";
 import { User } from "firebase/auth";
 import Image from "next/image";
 import {
