@@ -51,7 +51,7 @@ const Select: React.FC<SelectProps> = ({
       <button
         type="button"
         className={`p-2 px-4 mt-1 border bg-white rounded-lg w-full text-left flex items-center justify-between ${
-          isOpen ? "border-indigo-500" : "border-gray-300"
+          isOpen ? "border-primary" : "border-gray-300"
         }`}
         onClick={() => setIsOpen(!isOpen)}
       >

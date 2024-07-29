@@ -33,8 +33,8 @@ const PreviewComp: React.FC<{
       <div className="flex flex-col items-center mb-14">
         <div className="h-[120px] w-[120px] rounded-full mb-6 overflow-hidden border-4 ">
           <Image
-            src=""
-            alt=""
+            src={user?.photoURL || ""}
+            alt="profilePic"
             width={300}
             height={300}
             className="w-full h-full object-cover"

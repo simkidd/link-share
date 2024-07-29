@@ -1,7 +1,7 @@
 import { CreateUserInput, LoginUserInput } from "@/interfaces/auth.interface";
-import { User } from "@/interfaces/user.interface";
+import { UpdateProfileInput, User } from "@/interfaces/user.interface";
 import { TOKEN_NAME } from "@/utils/constants";
-import { auth, db } from "@/utils/firebaseConfig";
+import { auth, db, storage } from "@/utils/firebaseConfig";
 import { generateDisplayName } from "@/utils/helpers";
 import { FirebaseError } from "firebase/app";
 import {
@@ -10,8 +10,10 @@ import {
   signInWithEmailAndPassword,
   signOut,
   updateProfile,
+  updateEmail,
 } from "firebase/auth";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import Cookies from "js-cookie";
 import { toast } from "sonner";
 import { create } from "zustand";
@@ -19,13 +21,17 @@ import { create } from "zustand";
 interface IAuthStore {
   loading: boolean;
   loadingUser: boolean;
+  loadingSave: boolean;
   user: User | null;
   setUser: (user: User) => void;
   createUser: (input: CreateUserInput) => Promise<void>;
   login: (input: LoginUserInput) => Promise<void>;
   logout: () => void;
   initializeAuth: () => void;
-  updateUserProfile: (profile: Partial<User>) => Promise<void>;
+  updateUserProfile: (
+    profile: UpdateProfileInput,
+    file?: File | null
+  ) => Promise<void>;
   fetchUserData: (uid: string) => Promise<void>;
 }
 
@@ -57,6 +63,7 @@ const getFirebaseErrorMessage = (error: FirebaseError) => {
 export const useAuthStore = create<IAuthStore>((set) => ({
   loading: false,
   loadingUser: false,
+  loadingSave: false,
   user: null,
   setUser: (user: User) => set({ user }),
   createUser: async (input) => {
@@ -130,19 +137,55 @@ export const useAuthStore = create<IAuthStore>((set) => ({
     await signOut(auth);
     set({ user: null });
   },
-  updateUserProfile: async (profile) => {
+  updateUserProfile: async (profile, file) => {
     try {
-      set({ loading: true });
+      set({ loadingSave: true });
+
       if (auth.currentUser) {
-        await updateProfile(auth.currentUser, profile);
-        toast.success("Profile updated successfully");
+        const { firstName, lastName, email } = profile;
+
+        // Update Firebase Auth profile
+        const displayName = `${firstName} ${lastName}`;
+
+        if (email && email !== auth.currentUser.email) {
+          await updateEmail(auth.currentUser, email);
+        }
+
+        let photoUrl = auth.currentUser.photoURL;
+        if (file) {
+          const storageRef = ref(
+            storage,
+            `profilePhotos/${auth.currentUser.uid}`
+          );
+          await uploadBytes(storageRef, file);
+          photoUrl = await getDownloadURL(storageRef);
+        }
+
+        await updateProfile(auth.currentUser, {
+          displayName,
+          photoURL: photoUrl,
+        });
+
+        // Update Firestore document
+        const userDocRef = doc(db, "users", auth.currentUser.uid);
+        const userDocUpdates: Partial<User> = {
+          displayName,
+          email,
+          photoUrl: photoUrl || "",
+        };
+
+        await updateDoc(userDocRef, userDocUpdates);
 
         set((state) => ({
           user: {
             ...state.user,
             ...profile,
+            displayName,
+            photoUrl,
           } as User,
         }));
+
+        toast.success("Profile updated successfully");
       } else {
         toast.error("No user is currently signed in");
       }
@@ -151,13 +194,13 @@ export const useAuthStore = create<IAuthStore>((set) => ({
       const errorMsg = getFirebaseErrorMessage(error as FirebaseError);
       toast.error(errorMsg);
     } finally {
-      set({ loading: false });
+      set({ loadingSave: false });
     }
   },
   initializeAuth: () => {
     try {
       set({ loadingUser: true });
-      const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      const unsubscribe = onAuthStateChanged(auth, (user) => {
         if (user) {
           set({
             user: {
@@ -167,7 +210,6 @@ export const useAuthStore = create<IAuthStore>((set) => ({
               photoUrl: user.photoURL || "",
             },
           });
-
         } else {
           Cookies.remove(TOKEN_NAME);
           set({ user: null });

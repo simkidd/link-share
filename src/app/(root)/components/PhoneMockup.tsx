@@ -54,8 +54,8 @@ const PhoneMockup = () => {
               <div className="flex flex-col items-center mb-14">
                 <div className="h-[96px] w-[96px] rounded-full mb-6 overflow-hidden border-4 ">
                   <Image
-                    src=""
-                    alt=""
+                    src={user?.photoUrl || ""}
+                    alt="profilePic"
                     width={300}
                     height={300}
                     className="w-full h-full object-cover"
