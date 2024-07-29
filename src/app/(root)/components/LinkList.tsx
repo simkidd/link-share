@@ -258,7 +258,7 @@ const LinkList = () => {
                           handleChangeEditing(link.id, "url", e.target.value)
                         }
                         placeholder="https://yourlink.com"
-                        className={`p-2 pl-10 border border-gray-300 focus:outline-none focus:border-indigo-500 rounded-lg w-full ${
+                        className={`p-2 pl-10 border border-gray-300 focus:outline-none focus:border-primary rounded-lg w-full ${
                           validationErrors.some((error) => error.id === link.id)
                             ? "border-red-500"
                             : ""
@@ -341,7 +341,7 @@ const LinkList = () => {
                       handleChangeNew(index, "url", e.target.value)
                     }
                     placeholder="https://www.example.com"
-                    className={`p-2 pl-10 border border-gray-300 focus:outline-none focus:border-indigo-500 rounded-lg w-full ${
+                    className={`p-2 pl-10 border border-gray-300 focus:outline-none focus:border-primary rounded-lg w-full ${
                       validationErrors.some((error) => error.index === index)
                         ? "border-red-500"
                         : ""

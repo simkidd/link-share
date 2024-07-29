@@ -157,7 +157,7 @@ export const useAuthStore = create<IAuthStore>((set) => ({
   initializeAuth: () => {
     try {
       set({ loadingUser: true });
-      const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      const unsubscribe = onAuthStateChanged(auth, (user) => {
         if (user) {
           set({
             user: {
@@ -167,7 +167,6 @@ export const useAuthStore = create<IAuthStore>((set) => ({
               photoUrl: user.photoURL || "",
             },
           });
-
         } else {
           Cookies.remove(TOKEN_NAME);
           set({ user: null });
