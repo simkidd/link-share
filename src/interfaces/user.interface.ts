@@ -1,6 +1,6 @@
 export interface User {
   uid: string;
-  photoUrl?: string;
+  photoURL?: string;
   displayName: string | null;
   email: string | null;
 }
@@ -15,5 +15,5 @@ export interface UpdateProfileInput {
   firstName: string;
   lastName: string;
   email: string;
-  photoUrl: string;
+  photoURL: string;
 }

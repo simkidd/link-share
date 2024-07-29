@@ -1,17 +1,17 @@
-import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { NextRequest, NextResponse } from "next/server";
 import { TOKEN_NAME } from "./utils/constants";
-import { auth } from "@/utils/firebaseConfig";
 
 const authRoutes = ["/login", "/sign-up"];
-const privateRoutes = ["/links", "/profile"];
-const publicRoutes = ["/preview"];
+const privateRoutes = ["/editor", "/profile"];
+const publicRoutes = ["/", "/preview"];
 
 export default async function middleware(req: NextRequest) {
   // Check if the current route is protected or public
   const path = req.nextUrl.pathname;
   const isAuthRoute = authRoutes.some((route) => path.startsWith(route));
   const isPrivateRoute = privateRoutes.some((route) => path.startsWith(route));
+  const isPublicRoute = publicRoutes.some((route) => path.startsWith(route));
 
   const token = cookies().get(TOKEN_NAME)?.value;
 

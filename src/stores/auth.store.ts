@@ -82,7 +82,7 @@ export const useAuthStore = create<IAuthStore>((set) => ({
         uid: user.uid,
         email: user.email || "",
         displayName: user.displayName || "",
-        photoUrl: user.photoURL || "",
+        photoURL: user.photoURL || "",
       };
 
       await setDoc(doc(db, "users", user.uid), userData);
@@ -115,7 +115,7 @@ export const useAuthStore = create<IAuthStore>((set) => ({
           uid: user.uid,
           email: user.email || "",
           displayName: user.displayName || "",
-          photoUrl: user.photoURL || "",
+          photoURL: user.photoURL || "",
         },
       });
 
@@ -171,7 +171,7 @@ export const useAuthStore = create<IAuthStore>((set) => ({
         const userDocUpdates: Partial<User> = {
           displayName,
           email,
-          photoUrl: photoUrl || "",
+          photoURL: photoUrl || "",
         };
 
         await updateDoc(userDocRef, userDocUpdates);
@@ -181,7 +181,7 @@ export const useAuthStore = create<IAuthStore>((set) => ({
             ...state.user,
             ...profile,
             displayName,
-            photoUrl,
+            photoURL: photoUrl,
           } as User,
         }));
 
@@ -207,7 +207,7 @@ export const useAuthStore = create<IAuthStore>((set) => ({
               uid: user.uid,
               email: user.email || "",
               displayName: user.displayName || "",
-              photoUrl: user.photoURL || "",
+              photoURL: user.photoURL || "",
             },
           });
         } else {

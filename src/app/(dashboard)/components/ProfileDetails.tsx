@@ -15,7 +15,7 @@ const ProfileDetails = () => {
     firstName: "",
     lastName: "",
     email: "",
-    photoUrl: "",
+    photoURL: "",
   });
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
@@ -25,7 +25,7 @@ const ProfileDetails = () => {
         firstName: user.displayName?.split(" ")[0] || "",
         lastName: user.displayName?.split(" ")[1] || "",
         email: user.email || "",
-        photoUrl: user.photoUrl || "",
+        photoURL: user.photoURL || "",
       });
     }
   }, [user]);
@@ -41,7 +41,7 @@ const ProfileDetails = () => {
     if (file) {
       setInput((prev) => ({
         ...prev,
-        profileUrl: URL.createObjectURL(file),
+        photoURL: URL.createObjectURL(file),
       }));
     }
   };
@@ -65,10 +65,10 @@ const ProfileDetails = () => {
               htmlFor="profilePhoto"
               className="relative flex flex-col items-center justify-center h-[193px] aspect-square bg-purple-100 cursor-pointer rounded-xl overflow-hidden text-purple-600 gap-2 group"
             >
-              {input.photoUrl ? (
+              {input.photoURL ? (
                 <>
                   <Image
-                    src={input.photoUrl}
+                    src={input.photoURL}
                     alt="Profile"
                     className="w-full h-full object-cover"
                     width={300}

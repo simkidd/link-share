@@ -1,5 +1,4 @@
 "use client";
-import Logo from "@/components/Logo";
 import Button from "@/components/ui/Button";
 import { useAuthStore } from "@/stores/auth.store";
 import { useLinkStore } from "@/stores/link.store";
@@ -54,7 +53,7 @@ const PhoneMockup = () => {
               <div className="flex flex-col items-center mb-14">
                 <div className="h-[96px] w-[96px] rounded-full mb-6 overflow-hidden border-4 ">
                   <Image
-                    src={user?.photoUrl || ""}
+                    src={user?.photoURL || ""}
                     alt="profilePic"
                     width={300}
                     height={300}

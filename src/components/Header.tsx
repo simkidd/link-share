@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Logo from "./Logo";
@@ -7,10 +7,16 @@ import Button from "./ui/Button";
 import { useAuthStore } from "@/stores/auth.store";
 import { FaEye, FaLink } from "react-icons/fa6";
 import { BiUserCircle } from "react-icons/bi";
+import { LogOut } from "lucide-react";
 
 const Header = () => {
   const { user, logout } = useAuthStore();
   const pathname = usePathname();
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    setIsLoading(false);
+  }, []);
 
   const isActive = (href: string) => {
     return (
@@ -46,15 +52,20 @@ const Header = () => {
             <span className="hidden md:block">Profile Details</span>
           </Link>
         </div>
-        {user && (
-          <div className="md:flex hidden gap-2">
-            <p>{user?.email}</p>
-            <button onClick={logout} className="text-red-500">
-              Logout
-            </button>
-          </div>
-        )}
-        <div>
+
+        <div className="flex items-center gap-4">
+          {isLoading ? (
+            <div className="size-11 rounded-lg bg-gray-300 animate-pulse"></div>
+          ) : (
+            user && (
+              <div className="">
+                <button onClick={logout} className="text-red-500 p-[11px]">
+                  <LogOut size={20} />
+                </button>
+              </div>
+            )
+          )}
+
           <Link href={`/preview/${user?.uid}`}>
             <Button
               variant="outline"
