@@ -15,5 +15,5 @@ export interface UpdateProfileInput {
   firstName: string;
   lastName: string;
   email: string;
-  profilePhoto: string;
+  photoUrl: string;
 }

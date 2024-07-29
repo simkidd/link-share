@@ -181,7 +181,7 @@ export const useAuthStore = create<IAuthStore>((set) => ({
             ...state.user,
             ...profile,
             displayName,
-            profilePhoto: photoUrl,
+            photoUrl,
           } as User,
         }));
 

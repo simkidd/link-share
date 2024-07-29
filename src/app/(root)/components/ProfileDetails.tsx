@@ -6,13 +6,16 @@ import { ImageIcon } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
+const MAX_FILE_SIZE_MB = 1; // Maximum file size in MB
+const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
+
 const ProfileDetails = () => {
   const { user, updateUserProfile, loadingSave } = useAuthStore();
   const [input, setInput] = useState<UpdateProfileInput>({
     firstName: "",
     lastName: "",
     email: "",
-    profilePhoto: "",
+    photoUrl: "",
   });
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
@@ -22,7 +25,7 @@ const ProfileDetails = () => {
         firstName: user.displayName?.split(" ")[0] || "",
         lastName: user.displayName?.split(" ")[1] || "",
         email: user.email || "",
-        profilePhoto: user.photoUrl || "",
+        photoUrl: user.photoUrl || "",
       });
     }
   }, [user]);
@@ -38,7 +41,7 @@ const ProfileDetails = () => {
     if (file) {
       setInput((prev) => ({
         ...prev,
-        profilePhoto: URL.createObjectURL(file),
+        profileUrl: URL.createObjectURL(file),
       }));
     }
   };
@@ -62,10 +65,10 @@ const ProfileDetails = () => {
               htmlFor="profilePhoto"
               className="relative flex flex-col items-center justify-center h-[193px] aspect-square bg-purple-100 cursor-pointer rounded-xl overflow-hidden text-purple-600 gap-2 group"
             >
-              {input.profilePhoto ? (
+              {input.photoUrl ? (
                 <>
                   <Image
-                    src={input.profilePhoto}
+                    src={input.photoUrl}
                     alt="Profile"
                     className="w-full h-full object-cover"
                     width={300}
