@@ -23,11 +23,13 @@ const PreviewHeader: React.FC<{ user: User }> = ({ user }) => {
 
   return (
     <div className="flex gap-4 items-center justify-between container mx-auto px-2 py-4">
-      {currentUser?.uid === user?.uid && authUser?.uid === user?.uid && (
-        <Link href="/editor">
-          <Button variant="outline">Back to Editor</Button>
-        </Link>
-      )}
+      {currentUser &&
+        currentUser?.uid === user?.uid &&
+        authUser?.uid === user?.uid && (
+          <Link href="/editor">
+            <Button variant="outline">Back to Editor</Button>
+          </Link>
+        )}
       <Button onClick={copyPageUrl} className="ms-auto">
         Share Link
       </Button>
