@@ -23,6 +23,7 @@ const PreviewHeader: React.FC<{ user: User }> = ({ user }) => {
 
   return (
     <div className="flex gap-4 items-center justify-between container mx-auto px-2 py-4">
+<<<<<<< HEAD
       {currentUser &&
         currentUser?.uid === user?.uid &&
         authUser?.uid === user?.uid && (
@@ -30,6 +31,13 @@ const PreviewHeader: React.FC<{ user: User }> = ({ user }) => {
             <Button variant="outline">Back to Editor</Button>
           </Link>
         )}
+=======
+      {currentUser?.uid === user?.uid && authUser?.uid === user?.uid && (
+        <Link href="/editor">
+          <Button variant="outline">Back to Editor</Button>
+        </Link>
+      )}
+>>>>>>> 204d4f7d48429c70af6b851cf973cfca89418577
       <Button onClick={copyPageUrl} className="ms-auto">
         Share Link
       </Button>
