@@ -21,7 +21,7 @@ const PreviewHeader: React.FC<{ user: User }> = ({ user }) => {
 
   return (
     <div className="flex gap-4 items-center justify-between container mx-auto px-2 py-4">
-      {authUser?.uid === user?.uid && (
+      {authUser && authUser?.uid === user?.uid && (
         <Link href="/editor">
           <Button variant="outline">Back to Editor</Button>
         </Link>
